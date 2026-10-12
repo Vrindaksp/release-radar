@@ -1,48 +1,29 @@
 "use client";
 
-import { Archive, Radar, Siren, type LucideIcon } from "lucide-react";
-import type { FeedbackInput, Release, TriageColumn } from "@/lib/types";
+import { useState } from "react";
+import { timeAgo } from "@/lib/format";
+import { TAB_SLUGS } from "@/lib/tabs";
+import { TRIAGE_COLUMNS, type FeedbackInput, type Release, type TriageColumn } from "@/lib/types";
 import ReleaseCard from "./ReleaseCard";
+import { TAB_META } from "./Tabs";
+import { btnSecondary } from "./ui";
 
-interface ColumnMeta {
-  column: TriageColumn;
-  subtitle: string;
-  empty: string;
-  icon: LucideIcon;
-  bar: string;
-  iconStyle: string;
-  count: string;
-}
+const PAGE_SIZE = 30;
 
-const COLUMNS: ColumnMeta[] = [
-  {
-    column: "Immediate Triage",
+const COPY: Record<TriageColumn, { subtitle: string; empty: string }> = {
+  "Immediate Triage": {
     subtitle: "Security patches & breaking updates that need action now",
     empty: "Nothing urgent — no security fixes or breaking changes waiting.",
-    icon: Siren,
-    bar: "bg-gradient-to-r from-red-500/80 via-orange-500/50 to-transparent",
-    iconStyle: "bg-red-500/15 text-red-300 ring-red-400/25",
-    count: "bg-red-500/20 text-red-200 ring-red-400/30",
   },
-  {
-    column: "Watchlist Radar",
+  "Watchlist Radar": {
     subtitle: "Evaluation cadence & routine new releases",
     empty: "No routine releases on the radar this week.",
-    icon: Radar,
-    bar: "bg-gradient-to-r from-sky-500/80 via-indigo-500/50 to-transparent",
-    iconStyle: "bg-sky-500/15 text-sky-300 ring-sky-400/25",
-    count: "bg-sky-500/20 text-sky-200 ring-sky-400/30",
   },
-  {
-    column: "Archived / Cleaned",
-    subtitle: "Processed, dismissed, or noise filtered by Gemini",
+  "Archived / Cleaned": {
+    subtitle: "Processed, dismissed, or noise filtered by Gemini — plus backfilled history",
     empty: "Archived and auto-cleaned releases will show up here.",
-    icon: Archive,
-    bar: "bg-gradient-to-r from-zinc-500/70 via-zinc-600/40 to-transparent",
-    iconStyle: "bg-zinc-500/15 text-zinc-300 ring-white/10",
-    count: "bg-zinc-500/20 text-zinc-200 ring-white/15",
   },
-];
+};
 
 /** Most urgent first: security, then breaking, then critical-path tier, then newest. */
 function compareReleases(a: Release, b: Release): number {
@@ -55,64 +36,108 @@ function compareReleases(a: Release, b: Release): number {
 }
 
 interface BoardProps {
+  /** The tab being shown. */
+  tab: TriageColumn;
+  /** Releases after search / filter, across all tabs. */
   releases: Release[];
+  counts: Record<TriageColumn, number>;
   filtering: boolean;
+  /** When the last sync finished, if ever. */
+  lastSyncedAt: string | null;
+  onTabChange: (tab: TriageColumn) => void;
   onMove: (release: Release, column: TriageColumn) => void;
   onFeedback: (release: Release, input: Omit<FeedbackInput, "releaseId">) => Promise<void>;
   onNotify: (kind: "success" | "error", message: string) => void;
 }
 
-export default function Board({ releases, filtering, onMove, onFeedback, onNotify }: BoardProps) {
-  return (
-    <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-3">
-      {COLUMNS.map((meta) => {
-        const items = releases.filter((release) => release.triageColumn === meta.column).sort(compareReleases);
-        const Icon = meta.icon;
-        return (
-          <section
-            key={meta.column}
-            aria-label={meta.column}
-            className="flex min-h-0 flex-col overflow-hidden rounded-2xl bg-zinc-900/40 ring-1 ring-white/10"
-          >
-            <div className={`h-0.5 shrink-0 ${meta.bar}`} aria-hidden />
-            <header className="flex shrink-0 items-start gap-3 px-4 pt-3.5 pb-2.5">
-              <span className={`mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg ring-1 ring-inset ${meta.iconStyle}`}>
-                <Icon className="size-4.5" aria-hidden />
-              </span>
-              <div className="min-w-0 flex-1">
-                <h2 className="flex items-center gap-2 text-sm font-semibold tracking-tight text-zinc-100">
-                  {meta.column}
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums ring-1 ring-inset ${meta.count}`}
-                    aria-label={`${items.length} items`}
-                  >
-                    {items.length}
-                  </span>
-                </h2>
-                <p className="text-xs text-zinc-400">{meta.subtitle}</p>
-              </div>
-            </header>
+/** The panel for the active tab: one comfortable, two-column-on-desktop list of cards. */
+export default function Board({ tab, releases, counts, filtering, lastSyncedAt, onTabChange, onMove, onFeedback, onNotify }: BoardProps) {
+  const items = releases.filter((release) => release.triageColumn === tab).sort(compareReleases);
+  const meta = TAB_META[tab];
+  const Icon = meta.icon;
+  // When a search / filter leaves this tab empty (or short), point at where the matches are.
+  const elsewhere = TRIAGE_COLUMNS.filter((column) => column !== tab && counts[column] > 0);
 
-            <div className="thin-scroll min-h-0 flex-1 space-y-3 px-3 pt-1 pb-3 lg:overflow-y-auto">
-              {items.length === 0 ? (
-                <p className="rounded-xl border border-dashed border-white/10 px-4 py-8 text-center text-sm text-zinc-400">
-                  {filtering ? "No releases match the current search / filter." : meta.empty}
-                </p>
-              ) : (
-                items.map((release) => (
-                  <ReleaseCard
-                    key={release.id}
-                    release={release}
-                    onMove={onMove}
-                    onFeedback={onFeedback}
-                    onNotify={onNotify}
-                  />
-                ))
-              )}
+  return (
+    <div role="tabpanel" id="board-panel" aria-labelledby={`tab-${TAB_SLUGS[tab]}`} className="mx-auto w-full max-w-6xl">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+        <div className="flex items-center gap-2.5">
+          <Icon className="size-4 text-zinc-400" aria-hidden />
+          <h2 className="text-sm font-semibold text-zinc-100">{tab}</h2>
+          <p className="text-sm text-zinc-400">{COPY[tab].subtitle}</p>
+        </div>
+        <p className="text-xs text-zinc-400">
+          {lastSyncedAt ? `Last sync ${timeAgo(lastSyncedAt)}` : "Not synced yet"} · auto-syncs Mondays 12:00 UTC
+        </p>
+      </div>
+
+      {filtering && elsewhere.length > 0 && items.length > 0 && (
+        <p className="-mt-2 mb-4 text-xs text-zinc-400">
+          Also matching in{" "}
+          {elsewhere.map((column, index) => (
+            <span key={column}>
+              {index > 0 && ", "}
+              <button type="button" onClick={() => onTabChange(column)} className="font-medium text-indigo-300 underline-offset-2 hover:underline">
+                {column} ({counts[column]})
+              </button>
+            </span>
+          ))}
+        </p>
+      )}
+
+      {items.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-white/10 px-6 py-14 text-center">
+          <p className="text-sm text-zinc-300">{filtering ? "No releases match the current search / filter here." : COPY[tab].empty}</p>
+          {filtering && elsewhere.length > 0 && (
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+              {elsewhere.map((column) => (
+                <button key={column} type="button" onClick={() => onTabChange(column)} className={`${btnSecondary} h-8 px-3 text-xs`}>
+                  {counts[column]} in {column}
+                </button>
+              ))}
             </div>
-          </section>
-        );
-      })}
+          )}
+        </div>
+      ) : (
+        // Re-keyed per tab + result set, so paging restarts whenever what's shown changes.
+        <CardList key={`${tab}|${filtering}`} items={items} onMove={onMove} onFeedback={onFeedback} onNotify={onNotify} />
+      )}
     </div>
+  );
+}
+
+function CardList({
+  items,
+  onMove,
+  onFeedback,
+  onNotify,
+}: {
+  items: Release[];
+  onMove: BoardProps["onMove"];
+  onFeedback: BoardProps["onFeedback"];
+  onNotify: BoardProps["onNotify"];
+}) {
+  const [limit, setLimit] = useState(PAGE_SIZE);
+  const shown = items.slice(0, limit);
+  const remaining = items.length - shown.length;
+
+  return (
+    <>
+      <div className="grid items-start gap-4 lg:grid-cols-2">
+        {shown.map((release) => (
+          <ReleaseCard key={release.id} release={release} onMove={onMove} onFeedback={onFeedback} onNotify={onNotify} />
+        ))}
+      </div>
+      {remaining > 0 && (
+        <div className="mt-6 flex flex-col items-center gap-2">
+          <p className="text-xs text-zinc-400">
+            Showing {shown.length} of {items.length}
+          </p>
+          <button type="button" onClick={() => setLimit((current) => current + PAGE_SIZE)} className={`${btnSecondary} h-9 px-4 text-sm`}>
+            Show {Math.min(PAGE_SIZE, remaining)} more
+          </button>
+        </div>
+      )}
+    </>
   );
 }

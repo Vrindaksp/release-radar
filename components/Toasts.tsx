@@ -7,6 +7,8 @@ export interface Toast {
   id: number;
   kind: "success" | "error" | "info";
   message: string;
+  /** Optional one-click follow-up, e.g. "Undo". */
+  action?: { label: string; onClick: () => void };
 }
 
 const STYLES = {
@@ -29,6 +31,18 @@ export default function Toasts({ toasts, onDismiss }: { toasts: Toast[]; onDismi
           >
             <Icon className={`mt-0.5 size-4 shrink-0 ${style.tint}`} aria-hidden />
             <p className="min-w-0 flex-1 break-words">{toast.message}</p>
+            {toast.action && (
+              <button
+                type="button"
+                onClick={() => {
+                  toast.action!.onClick();
+                  onDismiss(toast.id);
+                }}
+                className={`shrink-0 rounded-md bg-white/10 px-2 py-0.5 text-xs font-semibold text-white ring-1 ring-white/15 ring-inset transition-colors hover:bg-white/20 ${focusRing}`}
+              >
+                {toast.action.label}
+              </button>
+            )}
             <button
               type="button"
               onClick={() => onDismiss(toast.id)}

@@ -24,6 +24,8 @@ import {
   submitFeedback,
 } from "@/lib/client";
 import { filterReleases } from "@/lib/search";
+import { countByColumn, DEFAULT_TAB, hashForTab, tabFromHash } from "@/lib/tabs";
+import { TRIAGE_COLUMNS } from "@/lib/types";
 import type {
   AlertsView,
   DigestFilter,
@@ -45,6 +47,7 @@ export default function DashboardPage() {
 
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<DigestFilter>("all");
+  const [tab, setTab] = useState<TriageColumn>(DEFAULT_TAB);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [alertsOpen, setAlertsOpen] = useState(false);
   const [alerts, setAlerts] = useState<AlertsView | null>(null);
@@ -75,10 +78,11 @@ export default function DashboardPage() {
   const dismissToast = useCallback((id: number) => setToasts((current) => current.filter((t) => t.id !== id)), []);
 
   const notify = useCallback(
-    (kind: Toast["kind"], message: string) => {
+    (kind: Toast["kind"], message: string, action?: Toast["action"]) => {
       const id = ++toastId.current;
-      setToasts((current) => [...current.slice(-3), { id, kind, message }]);
-      setTimeout(() => dismissToast(id), kind === "error" ? 9000 : 4500);
+      setToasts((current) => [...current.slice(-3), { id, kind, message, action }]);
+      // A toast with an action stays a little longer, so there's time to use it.
+      setTimeout(() => dismissToast(id), kind === "error" ? 9000 : action ? 7000 : 4500);
     },
     [dismissToast],
   );
@@ -115,18 +119,65 @@ export default function DashboardPage() {
     document.title = emergencyCount > 0 ? `(${emergencyCount}) 🚨 ${baseTitle.current}` : baseTitle.current;
   }, [emergencyCount]);
 
-  // "/" jumps to the search box, like GitHub.
+  // ---- tabs ----------------------------------------------------------------
+  // The active tab lives in the URL hash (#immediate / #watchlist / #archive), so a refresh or a
+  // shared link lands on the same list.
+  const changeTab = useCallback((next: TriageColumn) => {
+    setTab(next);
+    try {
+      window.history.replaceState(null, "", hashForTab(next));
+    } catch {
+      // history can be unavailable in sandboxed frames; the tab still switches
+    }
+    // Switching while scrolled deep into a list: start the new list at its top, below the pinned header.
+    requestAnimationFrame(() => {
+      const panel = document.getElementById("board-panel");
+      const offset = panel?.getBoundingClientRect().top ?? 0;
+      if (panel && offset < 0) window.scrollTo({ top: window.scrollY + offset - 150 });
+    });
+  }, []);
+
+  useEffect(() => {
+    const fromHash = () => {
+      const target = tabFromHash(window.location.hash);
+      if (target) setTab(target);
+    };
+    fromHash();
+    window.addEventListener("hashchange", fromHash);
+    return () => window.removeEventListener("hashchange", fromHash);
+  }, []);
+
+  /** Emergency banner → show the card: switch to Immediate Triage if needed, then scroll to it. */
+  const jumpToRelease = useCallback(
+    (release: Release) => {
+      changeTab("Immediate Triage");
+      setTimeout(() => {
+        const card = document.getElementById(`release-${release.id}`);
+        card?.scrollIntoView({ behavior: "smooth", block: "center" });
+        card?.focus({ preventScroll: true });
+      }, 80);
+    },
+    [changeTab],
+  );
+
+  // Keyboard: "/" jumps to the search box (like GitHub); 1 / 2 / 3 switch tabs.
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key !== "/" || event.metaKey || event.ctrlKey || event.altKey) return;
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
       const target = event.target as HTMLElement | null;
-      if (target?.closest("input, textarea, select, [contenteditable='true']")) return;
-      event.preventDefault();
-      searchRef.current?.focus();
+      if (target?.closest("input, textarea, select, [contenteditable='true']")) return; // typing
+      if (document.querySelector("[role=dialog]")) return;
+      if (event.key === "/") {
+        event.preventDefault();
+        searchRef.current?.focus();
+        return;
+      }
+      const index = ["1", "2", "3"].indexOf(event.key);
+      if (index !== -1) changeTab(TRIAGE_COLUMNS[index]);
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, []);
+  }, [changeTab]);
 
   // ---- derived -------------------------------------------------------------
   const releases = digest?.releases;
@@ -134,6 +185,8 @@ export default function DashboardPage() {
     () => (releases ? filterReleases(releases, query, filter) : []),
     [releases, query, filter],
   );
+  // What each tab would show right now (after search / filter) — drives the tab counts.
+  const tabCounts = useMemo(() => countByColumn(visible), [visible]);
   const counts = useMemo(() => {
     const open = (releases ?? []).filter((r) => r.triageColumn !== "Archived / Cleaned");
     return {
@@ -168,8 +221,12 @@ export default function DashboardPage() {
     }
   }
 
+  /**
+   * Moves a card between tabs. With tabs the card leaves the list you're looking at, so a toast says
+   * where it went and offers Undo (which moves it straight back, without another toast).
+   */
   const handleMove = useCallback(
-    async (release: Release, column: TriageColumn) => {
+    async (release: Release, column: TriageColumn, options: { undoable?: boolean } = {}) => {
       const previous = release.triageColumn;
       const apply = (to: TriageColumn) =>
         setDigest((current) =>
@@ -180,6 +237,12 @@ export default function DashboardPage() {
       apply(column); // optimistic
       try {
         await moveRelease(release.id, column);
+        if (options.undoable !== false) {
+          notify("info", `${release.repoName} ${release.versionTag} moved to ${column}`, {
+            label: "Undo",
+            onClick: () => void handleMove({ ...release, triageColumn: column }, previous, { undoable: false }),
+          });
+        }
       } catch (error) {
         apply(previous);
         notify("error", `Couldn't move ${release.repoName} ${release.versionTag}: ${errorMessage(error)}`);
@@ -300,13 +363,16 @@ export default function DashboardPage() {
   const firstRun = digest !== null && repos.length === 0;
 
   return (
-    <div className="flex min-h-screen flex-col lg:h-screen lg:overflow-hidden">
+    <div className="flex min-h-screen flex-col">
       <TopBar
         searchRef={searchRef}
         query={query}
         onQueryChange={setQuery}
         filter={filter}
         onFilterChange={setFilter}
+        tab={tab}
+        tabCounts={digest ? tabCounts : null}
+        onTabChange={changeTab}
         reposMonitored={digest?.stats.reposMonitored ?? null}
         criticalCount={digest ? counts.critical : null}
         securityCount={counts.security}
@@ -322,9 +388,9 @@ export default function DashboardPage() {
         emailActive={alerts ? alerts.email.active : null}
       />
 
-      <EmergencyBanner releases={digest?.releases ?? []} />
+      <EmergencyBanner releases={digest?.releases ?? []} onJump={jumpToRelease} />
 
-      <main className="flex min-h-0 flex-1 flex-col p-4">
+      <main className="flex-1 px-4 py-6 sm:px-6">
         {loading ? (
           <BoardSkeleton />
         ) : loadError && !digest ? (
@@ -344,8 +410,12 @@ export default function DashboardPage() {
           />
         ) : (
           <Board
+            tab={tab}
             releases={visible}
+            counts={tabCounts}
             filtering={filtering}
+            lastSyncedAt={digest?.stats.lastSyncedAt ?? null}
+            onTabChange={changeTab}
             onMove={handleMove}
             onFeedback={handleFeedback}
             onNotify={notify}

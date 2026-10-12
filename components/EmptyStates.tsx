@@ -5,22 +5,18 @@ import { btnPrimary, btnSecondary } from "./ui";
 
 export function BoardSkeleton() {
   return (
-    <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-3" aria-busy="true" aria-label="Loading digest">
-      {[0, 1, 2].map((column) => (
-        <div key={column} className="rounded-2xl bg-zinc-900/40 p-4 ring-1 ring-white/10">
-          <div className="mb-4 h-8 w-2/3 animate-pulse rounded-lg bg-zinc-800" />
-          <div className="space-y-3">
-            {[0, 1].map((card) => (
-              <div key={card} className="space-y-3 rounded-xl border border-l-4 border-white/10 border-l-zinc-700 bg-zinc-900 p-4">
-                <div className="h-4 w-1/2 animate-pulse rounded bg-zinc-800" />
-                <div className="h-3 w-1/4 animate-pulse rounded bg-zinc-800" />
-                <div className="h-3 w-full animate-pulse rounded bg-zinc-800" />
-                <div className="h-3 w-5/6 animate-pulse rounded bg-zinc-800" />
-              </div>
-            ))}
+    <div className="mx-auto w-full max-w-6xl" aria-busy="true" aria-label="Loading digest">
+      <div className="mb-4 h-5 w-72 max-w-full animate-pulse rounded bg-zinc-800" />
+      <div className="grid items-start gap-4 lg:grid-cols-2">
+        {[0, 1, 2, 3].map((card) => (
+          <div key={card} className="space-y-3 rounded-xl border border-l-4 border-white/10 border-l-zinc-700 bg-zinc-900 p-4">
+            <div className="h-4 w-1/2 animate-pulse rounded bg-zinc-800" />
+            <div className="h-3 w-1/4 animate-pulse rounded bg-zinc-800" />
+            <div className="h-3 w-full animate-pulse rounded bg-zinc-800" />
+            <div className="h-3 w-5/6 animate-pulse rounded bg-zinc-800" />
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }

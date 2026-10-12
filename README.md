@@ -15,7 +15,7 @@ routine noise is filtered out.
 
 | | |
 |---|---|
-| **Triage board** | Three columns — *Immediate Triage* (security / breaking), *Watchlist Radar* (routine & evaluation), *Archived / Cleaned* (noise Gemini filtered + items you dismissed). |
+| **Triage board** | Three tabs in the top bar, one list at a time — *Immediate Triage* (security / breaking), *Watchlist Radar* (routine & evaluation), *Archived / Cleaned* (noise Gemini filtered, items you dismissed, backfilled history). Each tab shows a live count; the active tab is kept in the URL (`#immediate`, `#watchlist`, `#archive`) and `1` `2` `3` switch tabs. Moving a card shows an **Undo** toast; long lists load 30 at a time. |
 | **Cards** | Repo, monospace version tag, Gemini's one-line impact, effort pill (Low / Med / High), severity, advisory ids, and a one-click **Copy Release Note / Create Ticket** that puts a paste-ready ticket on your clipboard. |
 | **Ask My Digest** | Instant search across repo, version, summary, CVE ids… plus `Security Only` / `Breaking Changes` / `All Releases` toggles. Press `/` to focus. |
 | **Repo manager** | Slide-over to add (`owner/repo` or a GitHub URL — verified against GitHub), re-prioritise (tier 1–3), pause, or remove repos. No code changes needed. |

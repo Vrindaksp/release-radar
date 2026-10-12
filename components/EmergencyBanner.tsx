@@ -12,15 +12,12 @@ const MAX_LISTED = 3;
  * part of the emergency escalation. Triage the card (archive / move it) and the
  * banner clears.
  */
-export default function EmergencyBanner({ releases }: { releases: Release[] }) {
+export default function EmergencyBanner({ releases, onJump }: { releases: Release[]; onJump: (release: Release) => void }) {
   const urgent = releases.filter((r) => r.emergencyAt && r.triageColumn === "Immediate Triage");
   if (urgent.length === 0) return null;
 
-  const jump = (id: number) => {
-    const card = document.getElementById(`release-${id}`);
-    card?.scrollIntoView({ behavior: "smooth", block: "center" });
-    card?.focus({ preventScroll: true });
-  };
+  // Switching to the Immediate Triage tab (if needed) and scrolling to the card is the page's job.
+  const jump = (release: Release) => onJump(release);
 
   return (
     <div
@@ -38,7 +35,7 @@ export default function EmergencyBanner({ releases }: { releases: Release[] }) {
             <li key={release.id}>
               <button
                 type="button"
-                onClick={() => jump(release.id)}
+                onClick={() => jump(release)}
                 title={release.geminiSummary}
                 className={`rounded-md bg-white/10 px-2 py-0.5 font-mono text-xs font-semibold text-red-50 ring-1 ring-white/15 ring-inset transition-colors hover:bg-white/20 ${focusRing}`}
               >
