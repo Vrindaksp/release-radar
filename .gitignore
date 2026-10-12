@@ -1,0 +1,12 @@
+node_modules
+.next
+out
+next-env.d.ts
+*.tsbuildinfo
+.vercel
+.claude
+
+# secrets — never commit (the example file is the one exception; keep this block last)
+.env
+.env.*
+!.env.example
