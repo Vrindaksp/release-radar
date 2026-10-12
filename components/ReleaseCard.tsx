@@ -10,13 +10,18 @@ import {
   Copy,
   ExternalLink,
   Eye,
+  FileText,
   Flag,
+  Info,
   Lightbulb,
+  ListChecks,
+  LoaderCircle,
   PencilLine,
 } from "lucide-react";
+import { fetchReleaseNotes } from "@/lib/client";
 import { copyToClipboard, timeAgo } from "@/lib/format";
 import { buildTicket } from "@/lib/ticket";
-import { restoreColumnFor } from "@/lib/triage";
+import { restoreColumnFor, whyHere } from "@/lib/triage";
 import type { FeedbackInput, Release, TriageColumn } from "@/lib/types";
 import {
   BreakingBadge,
@@ -45,14 +50,37 @@ function accentFor(release: Release): string {
   return "border-l-sky-500";
 }
 
+type NotesState =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "ready"; text: string | null; truncated: boolean }
+  | { status: "error"; message: string };
+
 export default function ReleaseCard({ release, onMove, onFeedback, onNotify }: ReleaseCardProps) {
   const [expanded, setExpanded] = useState(false);
   const [correcting, setCorrecting] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [notes, setNotes] = useState<NotesState>({ status: "idle" });
   const archived = release.triageColumn === "Archived / Cleaned";
-  const hasDetails = release.highlights.length > 0 || Boolean(release.recommendedAction);
-  // Sample rows are fictional — logging corrections for them would poison the tuning data.
+  // Sample rows are fictional: there are no original notes to show, and logging corrections for
+  // them would poison the tuning data.
   const canCorrect = !release.isSample;
+  const canShowNotes = !release.isSample;
+  // On open cards the recommended action is always visible; archived ones keep it in the details.
+  const inlineAction = !archived && release.recommendedAction;
+  const hasDetails = release.highlights.length > 0 || (archived && Boolean(release.recommendedAction)) || canShowNotes;
+
+  /** Original GitHub notes are fetched the first time they're asked for, then kept. */
+  async function loadNotes() {
+    if (notes.status === "loading" || notes.status === "ready") return;
+    setNotes({ status: "loading" });
+    try {
+      const result = await fetchReleaseNotes(release.id);
+      setNotes({ status: "ready", text: result.notes, truncated: result.truncated });
+    } catch (error) {
+      setNotes({ status: "error", message: error instanceof Error ? error.message : "Couldn't load the notes." });
+    }
+  }
 
   async function handleCopy() {
     try {
@@ -108,6 +136,23 @@ export default function ReleaseCard({ release, onMove, onFeedback, onNotify }: R
 
         <p className="text-sm leading-relaxed text-zinc-300">{release.geminiSummary}</p>
 
+        <p className="flex items-start gap-1.5 text-xs leading-relaxed text-zinc-400">
+          <Info className="mt-0.5 size-3.5 shrink-0" aria-hidden />
+          <span>
+            <span className="font-medium text-zinc-300">Why it&apos;s here:</span> {whyHere(release)}
+          </span>
+        </p>
+
+        {inlineAction && (
+          <div className="flex gap-2.5 rounded-r-lg border-l-2 border-indigo-400/70 bg-indigo-500/[0.08] py-2 pr-3 pl-3">
+            <ListChecks className="mt-0.5 size-4 shrink-0 text-indigo-300" aria-hidden />
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold tracking-wide text-indigo-300 uppercase">Recommended action</p>
+              <p className="mt-0.5 text-sm leading-relaxed text-zinc-100">{inlineAction}</p>
+            </div>
+          </div>
+        )}
+
         <div className="flex flex-wrap items-center gap-2">
           <EffortPill effort={release.effortScore} />
           {release.advisoryIds.map((id) => (
@@ -148,7 +193,7 @@ export default function ReleaseCard({ release, onMove, onFeedback, onNotify }: R
                   className={`inline-flex items-center gap-1 rounded text-xs font-medium text-zinc-400 transition-colors hover:text-zinc-100 ${focusRing}`}
                 >
                   <ChevronDown className={`size-3.5 transition-transform ${expanded ? "rotate-180" : ""}`} aria-hidden />
-                  {expanded ? "Hide details" : "Key changes & recommended action"}
+                  {expanded ? "Hide details" : canShowNotes ? "Key changes & original notes" : "Key changes"}
                 </button>
               ) : (
                 <span />
@@ -175,12 +220,13 @@ export default function ReleaseCard({ release, onMove, onFeedback, onNotify }: R
                     ))}
                   </ul>
                 )}
-                {release.recommendedAction && (
+                {archived && release.recommendedAction && (
                   <p className="flex items-start gap-1.5 font-medium text-zinc-100">
                     <Lightbulb className="mt-0.5 size-3.5 shrink-0 text-amber-300" aria-hidden />
                     {release.recommendedAction}
                   </p>
                 )}
+                {canShowNotes && <OriginalNotes state={notes} onLoad={loadNotes} />}
               </div>
             )}
             {correcting && (
@@ -240,6 +286,62 @@ export default function ReleaseCard({ release, onMove, onFeedback, onNotify }: R
         </a>
       </footer>
     </article>
+  );
+}
+
+/**
+ * "Check it yourself": the release notes exactly as GitHub published them, fetched on first open.
+ * Rendered as plain text (never HTML), because anyone can write a release.
+ */
+function OriginalNotes({ state, onLoad }: { state: NotesState; onLoad: () => void }) {
+  const [open, setOpen] = useState(false);
+
+  function toggle() {
+    if (!open) onLoad();
+    setOpen((value) => !value);
+  }
+
+  return (
+    <div className="border-t border-white/10 pt-2 first:border-t-0 first:pt-0">
+      <button
+        type="button"
+        onClick={toggle}
+        aria-expanded={open}
+        className={`inline-flex items-center gap-1.5 rounded font-medium text-zinc-300 transition-colors hover:text-zinc-100 ${focusRing}`}
+      >
+        <FileText className="size-3.5" aria-hidden />
+        {open ? "Hide original release notes" : "Show original release notes"}
+      </button>
+      {open && (
+        <div className="mt-2">
+          {state.status === "loading" && (
+            <p className="flex items-center gap-1.5 text-zinc-400" role="status">
+              <LoaderCircle className="size-3.5 animate-spin" aria-hidden />
+              Loading the original notes…
+            </p>
+          )}
+          {state.status === "error" && (
+            <p className="text-red-300" role="alert">
+              {state.message}{" "}
+              <button type="button" onClick={onLoad} className={`rounded underline underline-offset-2 ${focusRing}`}>
+                Try again
+              </button>
+            </p>
+          )}
+          {state.status === "ready" &&
+            (state.text === null ? (
+              <p className="text-zinc-400">No release notes were saved for this release.</p>
+            ) : (
+              <>
+                <pre className="thin-scroll max-h-64 overflow-auto rounded-md bg-black/40 p-2.5 font-mono text-[11px] leading-relaxed break-words whitespace-pre-wrap text-zinc-300 ring-1 ring-white/10 ring-inset">
+                  {state.text}
+                </pre>
+                {state.truncated && <p className="mt-1 text-zinc-400">Long notes are cut off here. Open the release on GitHub for the rest.</p>}
+              </>
+            ))}
+        </div>
+      )}
+    </div>
   );
 }
 

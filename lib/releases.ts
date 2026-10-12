@@ -76,7 +76,8 @@ export function mapRelease(row: Row): Release {
   };
 }
 
-// raw_notes is cached for reference but deliberately not sent to the browser.
+// raw_notes can be long, so it is left out of the digest payload and fetched per release on demand
+// (see getReleaseNotes).
 export const RELEASE_COLUMNS = `
   r.id, r.repository_id, r.version_tag, r.release_name, r.html_url, r.published_at,
   r.gemini_summary, r.highlights, r.recommended_action, r.advisory_ids, r.effort_score,
@@ -124,6 +125,24 @@ export async function getStats(): Promise<DashboardStats> {
     sampleReleaseCount: Number(row.sample_count),
     lastSyncedAt: row.last_synced_at ? new Date(row.last_synced_at as string | Date).toISOString() : null,
   };
+}
+
+/** Longest slice of a release's original notes sent to the browser. */
+export const MAX_NOTES_CHARS = 20_000;
+
+/**
+ * The release notes exactly as GitHub published them, so a summary can be checked against its source.
+ * `undefined` = no such release; `null` = it has no saved notes (sample rows, or an empty release body).
+ */
+export async function getReleaseNotes(id: number): Promise<{ notes: string | null; truncated: boolean } | undefined> {
+  const sql = await db();
+  const rows = await sql`select raw_notes from releases where id = ${id}`;
+  if (!rows[0]) return undefined;
+  const text = typeof rows[0].raw_notes === "string" ? rows[0].raw_notes : "";
+  if (!text.trim()) return { notes: null, truncated: false };
+  return text.length > MAX_NOTES_CHARS
+    ? { notes: text.slice(0, MAX_NOTES_CHARS), truncated: true }
+    : { notes: text, truncated: false };
 }
 
 /** Moves a card between columns (triage). Returns null if the release doesn't exist. */

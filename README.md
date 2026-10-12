@@ -15,8 +15,10 @@ routine noise is filtered out.
 
 | | |
 |---|---|
-| **Triage board** | Three tabs in the top bar, one list at a time — *Immediate Triage* (security / breaking), *Watchlist Radar* (routine & evaluation), *Archived / Cleaned* (noise Gemini filtered, items you dismissed, backfilled history). Each tab shows a live count; the active tab is kept in the URL (`#immediate`, `#watchlist`, `#archive`) and `1` `2` `3` switch tabs. Moving a card shows an **Undo** toast; long lists load 30 at a time. |
-| **Cards** | Repo, monospace version tag, Gemini's one-line impact, effort pill (Low / Med / High), severity, advisory ids, and a one-click **Copy Release Note / Create Ticket** that puts a paste-ready ticket on your clipboard. |
+| **Triage board** | Three tabs in the top bar, one list at a time — *Immediate Triage* (security / breaking), *Watchlist Radar* (routine & evaluation), *Archived / Cleaned* (noise Gemini filtered, items you dismissed, backfilled history). Each tab shows a live count; the active tab is kept in the URL (`#immediate`, `#watchlist`, `#archive`) and `1` `2` `3` switch tabs, `?` opens *How it works*. Moving a card shows an **Undo** toast; long lists load 30 at a time. |
+| **Digest status** | A panel above the lists answers "what needs me?" at a glance: a donut of open releases (urgent vs. routine) with the count in the middle, a legend whose rows jump to each list, `security` / `breaking` chips that double as filters, and the pipeline's health — repos tracked, last sync, next auto-sync (in your time zone), how many urgent items are carried over from earlier weeks, and a warning when a repo couldn't be checked. |
+| **Cards** | Repo, monospace version tag, Gemini's one-line impact, a plain-language **Why it's here** line (severity, impact, tier), an inline **Recommended action**, effort pill (Low / Med / High), advisory ids, a one-click **Copy Release Note / Create Ticket**, and **Show original release notes** to check a summary against GitHub's own text (fetched on demand, shown as plain text). |
+| **How it works** | A slide-over (`?`) that explains the pipeline, who decides what (Gemini proposes, fixed rules place and alert, you have the final say) and where the tool falls short. The alert rule it quotes is read live from the server. |
 | **Ask My Digest** | Instant search across repo, version, summary, CVE ids… plus `Security Only` / `Breaking Changes` / `All Releases` toggles. Press `/` to focus. |
 | **Repo manager** | Slide-over to add (`owner/repo` or a GitHub URL — verified against GitHub), re-prioritise (tier 1–3), pause, or remove repos. No code changes needed. |
 | **Backfill** | One click loads up to a year of older releases into the archive (searchable, never alerting). |
@@ -188,6 +190,7 @@ locked out.
 |---|---|
 | `GET /api/releases` | Board data + header counters |
 | `PATCH /api/releases/:id` | Move a card (`{ triageColumn }`) |
+| `GET /api/releases/:id/notes` | The original GitHub release notes behind a summary (plain text, capped at 20,000 characters) |
 | `GET/POST /api/repos` · `PATCH/DELETE /api/repos/:id` | Manage tracked repositories |
 | `GET/PUT /api/alerts` · `POST /api/alerts/test` | Email alert settings (masked) · send a labelled test email to the saved recipients |
 | `POST /api/feedback` · `GET /api/feedback` | Correct a classification · list the log |

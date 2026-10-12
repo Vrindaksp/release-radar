@@ -60,6 +60,10 @@ export const removeRepository = (id: number) => request<{ ok: true }>(`/api/repo
 export const moveRelease = (id: number, triageColumn: TriageColumn) =>
   request<{ release: Release }>(`/api/releases/${id}`, send("PATCH", { triageColumn })).then((data) => data.release);
 
+/** The original GitHub release notes for one card (fetched on demand, not part of the digest). */
+export const fetchReleaseNotes = (id: number) =>
+  request<{ notes: string | null; truncated: boolean }>(`/api/releases/${id}/notes`);
+
 export const runSync = (repositoryId?: number) => request<IngestReport>("/api/ingest", send("POST", { repositoryId }));
 
 /** One batch of a history backfill; call repeatedly until `remaining` hits 0. */

@@ -8,7 +8,7 @@ import { focusRing } from "./ui";
 
 interface TabMeta {
   icon: LucideIcon;
-  /** Shown on narrow screens, where the full name would not fit. */
+  /** Shown below the desktop breakpoint, where the full name would not fit. */
   short: string;
   /** Colour of the active underline and the count pill. */
   indicator: string;
@@ -91,8 +91,8 @@ export default function Tabs({ active, counts, onChange }: TabsProps) {
             }`}
           >
             <Icon className="size-4" aria-hidden />
-            <span className="sm:hidden">{meta.short}</span>
-            <span className="hidden sm:inline">{column}</span>
+            <span className="lg:hidden">{meta.short}</span>
+            <span className="hidden lg:inline">{column}</span>
             {counts && (
               <span
                 aria-hidden

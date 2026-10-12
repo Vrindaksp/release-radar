@@ -1,7 +1,7 @@
 "use client";
 
 import type { RefObject } from "react";
-import { Bell, FolderGit2, LoaderCircle, Radar, RefreshCw, Search, X } from "lucide-react";
+import { Bell, CircleHelp, FolderGit2, LoaderCircle, Radar, RefreshCw, Search, X } from "lucide-react";
 import { timeAgo } from "@/lib/format";
 import type { DigestFilter, TriageColumn } from "@/lib/types";
 import Tabs from "./Tabs";
@@ -27,6 +27,7 @@ interface TopBarProps {
   onSync: () => void;
   onOpenRepos: () => void;
   onOpenAlerts: () => void;
+  onOpenAbout: () => void;
   /** Whether email alerts are switched on and deliverable; null while unknown. */
   emailActive: boolean | null;
 }
@@ -121,7 +122,7 @@ function SearchBox({
   onQueryChange,
 }: Pick<TopBarProps, "searchRef" | "query" | "onQueryChange">) {
   return (
-    <div className="relative order-last w-full min-w-0 sm:order-none sm:w-auto sm:max-w-md sm:flex-1">
+    <div className="relative order-last w-full min-w-0 lg:order-none lg:w-auto lg:max-w-md lg:flex-1">
       <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-500" aria-hidden />
       <input
         ref={searchRef}
@@ -155,7 +156,7 @@ function SearchBox({
   );
 }
 
-/** Sync / Alerts / Manage repos. Icon-only until desktop width. */
+/** Sync / Alerts / Manage repos / How it works. Icon-only until a wide desktop. */
 function Actions(props: TopBarProps) {
   const lastSync = props.lastSyncedAt ? `Last sync ${timeAgo(props.lastSyncedAt)}` : "Not synced yet";
   return (
@@ -169,7 +170,7 @@ function Actions(props: TopBarProps) {
         className={`${btnSecondary} h-9 px-3 text-xs`}
       >
         {props.syncing ? <LoaderCircle className="size-3.5 animate-spin" aria-hidden /> : <RefreshCw className="size-3.5" aria-hidden />}
-        <span className="hidden lg:inline">{props.syncing ? "Syncing…" : "Sync now"}</span>
+        <span className="hidden xl:inline">{props.syncing ? "Syncing…" : "Sync now"}</span>
       </button>
       <button
         type="button"
@@ -179,7 +180,7 @@ function Actions(props: TopBarProps) {
         className={`${btnSecondary} relative h-9 px-3 text-xs`}
       >
         <Bell className="size-3.5" aria-hidden />
-        <span className="hidden lg:inline">Alerts</span>
+        <span className="hidden xl:inline">Alerts</span>
         {props.emailActive !== null && (
           <span
             aria-label={props.emailActive ? "Email alerts on" : "Email alerts off"}
@@ -189,7 +190,17 @@ function Actions(props: TopBarProps) {
       </button>
       <button type="button" onClick={props.onOpenRepos} aria-label="Manage repos" title="Manage repos" className={`${btnSecondary} h-9 px-3 text-xs`}>
         <FolderGit2 className="size-3.5" aria-hidden />
-        <span className="hidden lg:inline">Manage repos</span>
+        <span className="hidden xl:inline">Manage repos</span>
+      </button>
+      <button
+        type="button"
+        onClick={props.onOpenAbout}
+        aria-label="How it works"
+        title="How it works (?)"
+        className={`${btnSecondary} h-9 px-3 text-xs max-sm:hidden`}
+      >
+        <CircleHelp className="size-3.5" aria-hidden />
+        <span className="hidden xl:inline">How it works</span>
       </button>
     </div>
   );

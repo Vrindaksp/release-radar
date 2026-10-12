@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import AboutDrawer from "@/components/AboutDrawer";
 import AlertsDrawer from "@/components/AlertsDrawer";
 import Board from "@/components/Board";
+import DigestSummary from "@/components/DigestSummary";
 import EmergencyBanner from "@/components/EmergencyBanner";
 import { BoardSkeleton, ErrorPanel, FirstRunPanel } from "@/components/EmptyStates";
 import RepoDrawer, { type BackfillState } from "@/components/RepoDrawer";
@@ -50,6 +52,7 @@ export default function DashboardPage() {
   const [tab, setTab] = useState<TriageColumn>(DEFAULT_TAB);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [alertsOpen, setAlertsOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
   const [alerts, setAlerts] = useState<AlertsView | null>(null);
   const [alertsError, setAlertsError] = useState<string | null>(null);
   const [syncing, setSyncing] = useState(false);
@@ -62,6 +65,7 @@ export default function DashboardPage() {
 
   const closeDrawer = useCallback(() => setDrawerOpen(false), []);
   const closeAlerts = useCallback(() => setAlertsOpen(false), []);
+  const closeAbout = useCallback(() => setAboutOpen(false), []);
 
   // The Alerts panel's state also drives the little status dot on its top-bar button, so load it
   // up front — separately from the digest, so a problem here never blanks the board.
@@ -160,7 +164,7 @@ export default function DashboardPage() {
     [changeTab],
   );
 
-  // Keyboard: "/" jumps to the search box (like GitHub); 1 / 2 / 3 switch tabs.
+  // Keyboard: "/" jumps to the search box (like GitHub); 1 / 2 / 3 switch tabs; "?" opens How it works.
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.metaKey || event.ctrlKey || event.altKey) return;
@@ -170,6 +174,11 @@ export default function DashboardPage() {
       if (event.key === "/") {
         event.preventDefault();
         searchRef.current?.focus();
+        return;
+      }
+      if (event.key === "?") {
+        event.preventDefault();
+        setAboutOpen(true);
         return;
       }
       const index = ["1", "2", "3"].indexOf(event.key);
@@ -196,6 +205,17 @@ export default function DashboardPage() {
     };
   }, [releases]);
 
+  const failingRepos = repos.filter((repo) => repo.isActive && repo.lastSyncError).length;
+
+  /** A security / breaking chip in the summary: filter to it and show where those cards are. */
+  const showFiltered = useCallback(
+    (next: DigestFilter) => {
+      setFilter(next);
+      changeTab("Immediate Triage");
+    },
+    [changeTab],
+  );
+
   // ---- actions -------------------------------------------------------------
   async function handleSync() {
     if (!repos.some((repo) => repo.isActive)) {
@@ -208,7 +228,7 @@ export default function DashboardPage() {
       await load();
       const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
       let summary = `Synced ${plural(report.reposProcessed, "repo")} · ${plural(report.inserted, "new release")}`;
-      if (report.escalated > 0) summary += ` · ${plural(report.escalated, "emergency alert")} sent to Slack`;
+      if (report.escalated > 0) summary += ` · ${plural(report.escalated, "emergency alert")} sent`;
       const failed = report.results.find((result) => result.error);
       if (failed) {
         summary += ` · ${plural(report.reposWithErrors, "repo")} with errors — ${failed.repoName}: ${failed.error}`;
@@ -385,6 +405,7 @@ export default function DashboardPage() {
           setAlertsOpen(true);
           void loadAlerts(); // always show current settings when the panel opens
         }}
+        onOpenAbout={() => setAboutOpen(true)}
         emailActive={alerts ? alerts.email.active : null}
       />
 
@@ -409,17 +430,29 @@ export default function DashboardPage() {
             loadingSample={loadingSample}
           />
         ) : (
-          <Board
-            tab={tab}
-            releases={visible}
-            counts={tabCounts}
-            filtering={filtering}
-            lastSyncedAt={digest?.stats.lastSyncedAt ?? null}
-            onTabChange={changeTab}
-            onMove={handleMove}
-            onFeedback={handleFeedback}
-            onNotify={notify}
-          />
+          <>
+            <DigestSummary
+              releases={digest?.releases ?? []}
+              reposMonitored={digest?.stats.reposMonitored ?? 0}
+              lastSyncedAt={digest?.stats.lastSyncedAt ?? null}
+              failingRepos={failingRepos}
+              filter={filter}
+              onFilter={showFiltered}
+              onOpenTab={changeTab}
+              onOpenRepos={() => setDrawerOpen(true)}
+              onOpenAbout={() => setAboutOpen(true)}
+            />
+            <Board
+              tab={tab}
+              releases={visible}
+              counts={tabCounts}
+              filtering={filtering}
+              onTabChange={changeTab}
+              onMove={handleMove}
+              onFeedback={handleFeedback}
+              onNotify={notify}
+            />
+          </>
         )}
       </main>
 
@@ -447,6 +480,8 @@ export default function DashboardPage() {
           onRetry={() => void loadAlerts()}
         />
       )}
+
+      {aboutOpen && <AboutDrawer onClose={closeAbout} rule={alerts?.rule ?? null} />}
 
       <Toasts toasts={toasts} onDismiss={dismissToast} />
     </div>

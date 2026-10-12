@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { timeAgo } from "@/lib/format";
 import { TAB_SLUGS } from "@/lib/tabs";
 import { TRIAGE_COLUMNS, type FeedbackInput, type Release, type TriageColumn } from "@/lib/types";
 import ReleaseCard from "./ReleaseCard";
@@ -42,8 +41,6 @@ interface BoardProps {
   releases: Release[];
   counts: Record<TriageColumn, number>;
   filtering: boolean;
-  /** When the last sync finished, if ever. */
-  lastSyncedAt: string | null;
   onTabChange: (tab: TriageColumn) => void;
   onMove: (release: Release, column: TriageColumn) => void;
   onFeedback: (release: Release, input: Omit<FeedbackInput, "releaseId">) => Promise<void>;
@@ -51,7 +48,7 @@ interface BoardProps {
 }
 
 /** The panel for the active tab: one comfortable, two-column-on-desktop list of cards. */
-export default function Board({ tab, releases, counts, filtering, lastSyncedAt, onTabChange, onMove, onFeedback, onNotify }: BoardProps) {
+export default function Board({ tab, releases, counts, filtering, onTabChange, onMove, onFeedback, onNotify }: BoardProps) {
   const items = releases.filter((release) => release.triageColumn === tab).sort(compareReleases);
   const meta = TAB_META[tab];
   const Icon = meta.icon;
@@ -60,15 +57,12 @@ export default function Board({ tab, releases, counts, filtering, lastSyncedAt, 
 
   return (
     <div role="tabpanel" id="board-panel" aria-labelledby={`tab-${TAB_SLUGS[tab]}`} className="mx-auto w-full max-w-6xl">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+      <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-1">
         <div className="flex items-center gap-2.5">
           <Icon className="size-4 text-zinc-400" aria-hidden />
-          <h2 className="text-sm font-semibold text-zinc-100">{tab}</h2>
-          <p className="text-sm text-zinc-400">{COPY[tab].subtitle}</p>
+          <h2 className="text-base font-semibold text-zinc-100">{tab}</h2>
         </div>
-        <p className="text-xs text-zinc-400">
-          {lastSyncedAt ? `Last sync ${timeAgo(lastSyncedAt)}` : "Not synced yet"} · auto-syncs Mondays 12:00 UTC
-        </p>
+        <p className="text-sm text-zinc-400">{COPY[tab].subtitle}</p>
       </div>
 
       {filtering && elsewhere.length > 0 && items.length > 0 && (
