@@ -26,6 +26,13 @@ routine noise is filtered out.
 | **Dark theme** | A near-black, low-glare UI: soft raised surfaces, off-white text and muted accent colours. Every piece of text meets WCAG AA contrast (4.5:1). |
 | **Feedback loop** | Click **Wrong severity?** on any card to correct Gemini. Corrections are logged and replayed to Gemini as calibration examples. |
 
+## Components map
+
+Who and what is involved, from a release being published to Keerthi seeing it (rows = actors, columns =
+Trigger → Input → Context → Processing → AI → Output).
+
+![Release Radar components map](docs/components-map.png)
+
 ## Setup
 
 ```bash

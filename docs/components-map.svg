@@ -1,0 +1,171 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1186" viewBox="0 0 1100 1186" font-family="'Segoe UI', sans-serif">
+<defs>
+  <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="#14213d"/>
+  </marker>
+  <clipPath id="tableClip"><rect x="10" y="58" width="1080" height="1052" rx="9"/></clipPath>
+</defs>
+<rect width="1100" height="1186" fill="#ffffff"/>
+<text x="550" y="35" text-anchor="middle" font-size="21" font-weight="700" fill="#14213d">Release Radar · Weekly Digest — Components Map</text>
+<g clip-path="url(#tableClip)">
+<rect x="10" y="58" width="1080" height="44" fill="#14213d"/>
+<rect x="10" y="102" width="1080" height="112" fill="#e8ebfb"/>
+<rect x="10" y="102" width="126" height="112" fill="#14213d"/>
+<rect x="10" y="214" width="1080" height="112" fill="#e6eefb"/>
+<rect x="10" y="214" width="126" height="112" fill="#14213d"/>
+<rect x="10" y="326" width="1080" height="112" fill="#fdf4d9"/>
+<rect x="10" y="326" width="126" height="112" fill="#14213d"/>
+<rect x="10" y="438" width="1080" height="112" fill="#e4f3e7"/>
+<rect x="10" y="438" width="126" height="112" fill="#14213d"/>
+<rect x="10" y="550" width="1080" height="112" fill="#e4f3e7"/>
+<rect x="10" y="550" width="126" height="112" fill="#14213d"/>
+<rect x="10" y="662" width="1080" height="112" fill="#ece8f8"/>
+<rect x="10" y="662" width="126" height="112" fill="#14213d"/>
+<rect x="10" y="774" width="1080" height="112" fill="#fdeedd"/>
+<rect x="10" y="774" width="126" height="112" fill="#14213d"/>
+<rect x="10" y="886" width="1080" height="112" fill="#fae8ef"/>
+<rect x="10" y="886" width="126" height="112" fill="#14213d"/>
+<rect x="10" y="998" width="1080" height="112" fill="#e7eee8"/>
+<rect x="10" y="998" width="126" height="112" fill="#14213d"/>
+<line x1="136" y1="58" x2="136" y2="1110" stroke="#ffffff" stroke-width="1.6"/>
+<line x1="295" y1="58" x2="295" y2="1110" stroke="#ffffff" stroke-width="1.6"/>
+<line x1="454" y1="58" x2="454" y2="1110" stroke="#ffffff" stroke-width="1.6"/>
+<line x1="613" y1="58" x2="613" y2="1110" stroke="#ffffff" stroke-width="1.6"/>
+<line x1="772" y1="58" x2="772" y2="1110" stroke="#ffffff" stroke-width="1.6"/>
+<line x1="931" y1="58" x2="931" y2="1110" stroke="#ffffff" stroke-width="1.6"/>
+<line x1="1090" y1="58" x2="1090" y2="1110" stroke="#ffffff" stroke-width="1.6"/>
+<line x1="10" y1="102" x2="1090" y2="102" stroke="#ffffff" stroke-width="1.6"/>
+<line x1="10" y1="214" x2="1090" y2="214" stroke="#ffffff" stroke-width="1.6"/>
+<line x1="10" y1="326" x2="1090" y2="326" stroke="#ffffff" stroke-width="1.6"/>
+<line x1="10" y1="438" x2="1090" y2="438" stroke="#ffffff" stroke-width="1.6"/>
+<line x1="10" y1="550" x2="1090" y2="550" stroke="#ffffff" stroke-width="1.6"/>
+<line x1="10" y1="662" x2="1090" y2="662" stroke="#ffffff" stroke-width="1.6"/>
+<line x1="10" y1="774" x2="1090" y2="774" stroke="#ffffff" stroke-width="1.6"/>
+<line x1="10" y1="886" x2="1090" y2="886" stroke="#ffffff" stroke-width="1.6"/>
+<line x1="10" y1="998" x2="1090" y2="998" stroke="#ffffff" stroke-width="1.6"/>
+<line x1="10" y1="1110" x2="1090" y2="1110" stroke="#ffffff" stroke-width="1.6"/>
+</g>
+<text x="73" y="85" text-anchor="middle" font-size="12" fill="#ffffff">Actor</text>
+<text x="215.5" y="85" text-anchor="middle" font-size="12" fill="#ffffff">Trigger</text>
+<text x="374.5" y="85" text-anchor="middle" font-size="12" fill="#ffffff">Input</text>
+<text x="533.5" y="85" text-anchor="middle" font-size="12" fill="#ffffff">Context</text>
+<text x="692.5" y="85" text-anchor="middle" font-size="12" fill="#ffffff">Processing</text>
+<text x="851.5" y="85" text-anchor="middle" font-size="12" fill="#ffffff">AI</text>
+<text x="1010.5" y="85" text-anchor="middle" font-size="12" fill="#ffffff">Output</text>
+<text x="73" y="156.5" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">Maintainers</text>
+<text x="73" y="172.5" text-anchor="middle" font-size="8.8" fill="#aab6d6">(GitHub repos you track)</text>
+<text x="73" y="268.5" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">GitHub</text>
+<text x="73" y="284.5" text-anchor="middle" font-size="8.8" fill="#aab6d6">(REST API)</text>
+<text x="73" y="380.5" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">System</text>
+<text x="73" y="396.5" text-anchor="middle" font-size="8.8" fill="#aab6d6">(Next.js 16 API + Neon)</text>
+<text x="73" y="492.5" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">AI Model</text>
+<text x="73" y="508.5" text-anchor="middle" font-size="8.8" fill="#aab6d6">(Gemini Flash)</text>
+<text x="73" y="604.5" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">Guardrails</text>
+<text x="73" y="620.5" text-anchor="middle" font-size="8.8" fill="#aab6d6">(deterministic rules)</text>
+<text x="73" y="716.5" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">Triage Board</text>
+<text x="73" y="732.5" text-anchor="middle" font-size="8.8" fill="#aab6d6">(3 tabs, Neon)</text>
+<text x="73" y="828.5" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">Alerts</text>
+<text x="73" y="844.5" text-anchor="middle" font-size="8.8" fill="#aab6d6">(banner + Resend email)</text>
+<text x="73" y="940.5" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">Feedback Loop</text>
+<text x="73" y="956.5" text-anchor="middle" font-size="8.8" fill="#aab6d6">(corrections → prompts)</text>
+<text x="73" y="1052.5" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">Keerthi</text>
+<text x="73" y="1068.5" text-anchor="middle" font-size="8.8" fill="#aab6d6">(Senior fintech engineer)</text>
+<path d="M241.5,189.4 L241.5,270.0 L305.0,270.0" fill="none" stroke="#14213d" stroke-width="1.15" stroke-dasharray="4.5 3.2" marker-end="url(#arrow)"/>
+<path d="M189.5,189.4 L189.5,382.0 L305.0,382.0" fill="none" stroke="#14213d" stroke-width="1.15" stroke-dasharray="4.5 3.2" marker-end="url(#arrow)"/>
+<path d="M444.0,270.0 L464.0,270.0" fill="none" stroke="#14213d" stroke-width="1.15" stroke-dasharray="4.5 3.2" marker-end="url(#arrow)"/>
+<path d="M603.0,270.0 L610.0,270.0 L610.0,360.5 L623.0,360.5" fill="none" stroke="#14213d" stroke-width="1.15" stroke-dasharray="4.5 3.2" marker-end="url(#arrow)"/>
+<path d="M444.0,382.0 L623.0,382.0" fill="none" stroke="#14213d" stroke-width="1.15" stroke-dasharray="4.5 3.2" marker-end="url(#arrow)"/>
+<path d="M762.0,382.0 L851.5,382.0 L851.5,456.5" fill="none" stroke="#14213d" stroke-width="1.15" stroke-dasharray="4.5 3.2" marker-end="url(#arrow)"/>
+<path d="M782.0,494.0 L692.5,494.0 L692.5,568.5" fill="none" stroke="#14213d" stroke-width="1.15" stroke-dasharray="4.5 3.2" marker-end="url(#arrow)"/>
+<path d="M603.0,606.0 L623.0,606.0" fill="none" stroke="#14213d" stroke-width="1.15" stroke-dasharray="4.5 3.2" marker-end="url(#arrow)"/>
+<path d="M692.5,643.5 L692.5,686.6" fill="none" stroke="#14213d" stroke-width="1.15" stroke-dasharray="4.5 3.2" marker-end="url(#arrow)"/>
+<path d="M692.5,749.4 L692.5,798.6" fill="none" stroke="#14213d" stroke-width="1.15" stroke-dasharray="4.5 3.2" marker-end="url(#arrow)"/>
+<path d="M762.0,830.0 L941.0,830.0" fill="none" stroke="#14213d" stroke-width="1.15" stroke-dasharray="4.5 3.2" marker-end="url(#arrow)"/>
+<path d="M1010.5,855.3 L1010.5,1022.6" fill="none" stroke="#14213d" stroke-width="1.15" stroke-dasharray="4.5 3.2" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<path d="M285.0,942.0 L464.0,942.0" fill="none" stroke="#14213d" stroke-width="1.15" stroke-dasharray="4.5 3.2" marker-end="url(#arrow)"/>
+<path d="M603.0,942.0 L623.0,942.0" fill="none" stroke="#14213d" stroke-width="1.15" stroke-dasharray="4.5 3.2" marker-end="url(#arrow)"/>
+<path d="M762.0,942.0 L801.5,942.0 L801.5,531.5" fill="none" stroke="#14213d" stroke-width="1.15" stroke-dasharray="4.5 3.2" marker-end="url(#arrow)"/>
+<text x="247.5" y="265" text-anchor="start" font-size="8.4" font-style="italic" fill="#33405f">pulled</text>
+<text x="195.5" y="377" text-anchor="start" font-size="8.4" font-style="italic" fill="#33405f">pushed</text>
+<text x="605" y="323" text-anchor="end" font-size="8.4" font-style="italic" fill="#33405f">release notes</text>
+<text x="698.5" y="545" text-anchor="start" font-size="8.4" font-style="italic" fill="#33405f">analysis (JSON)</text>
+<text x="698.5" y="769" text-anchor="start" font-size="8.4" font-style="italic" fill="#33405f">emergency?</text>
+<text x="808.5" y="708" text-anchor="start" font-size="8.4" font-style="italic" fill="#33405f">past corrections</text>
+<text x="808.5" y="720" text-anchor="start" font-size="8.4" font-style="italic" fill="#33405f">→ next prompt</text>
+<rect x="146" y="126.6" width="139" height="62.8" rx="7" fill="#ebe5fb" stroke="#7c5cd6" stroke-width="1.5"/>
+<text x="215.5" y="142.8" text-anchor="middle" font-size="9.6" fill="#1f2a44">Publishes a release on</text>
+<text x="215.5" y="155.0" text-anchor="middle" font-size="9.6" fill="#1f2a44">GitHub (any hour, any</text>
+<text x="215.5" y="167.2" text-anchor="middle" font-size="9.6" fill="#1f2a44">tracked repo; stable or</text>
+<text x="215.5" y="179.4" text-anchor="middle" font-size="9.6" fill="#1f2a44">release candidate)</text>
+<rect x="305" y="244.7" width="139" height="50.599999999999994" rx="7" fill="#e1eefc" stroke="#3b82d6" stroke-width="1.5"/>
+<text x="374.5" y="260.9" text-anchor="middle" font-size="9.6" fill="#1f2a44">Release notes, tags and flags</text>
+<text x="374.5" y="273.1" text-anchor="middle" font-size="9.6" fill="#1f2a44">fetched from the GitHub API;</text>
+<text x="374.5" y="285.3" text-anchor="middle" font-size="9.6" fill="#1f2a44">drafts are skipped</text>
+<rect x="464" y="238.6" width="139" height="62.8" rx="7" fill="#e1f4e5" stroke="#3aa356" stroke-width="1.5"/>
+<text x="533.5" y="254.8" text-anchor="middle" font-size="9.6" fill="#1f2a44">Tracked repos + priority tier</text>
+<text x="533.5" y="267.0" text-anchor="middle" font-size="9.6" fill="#1f2a44">from Neon. Tier 1: stable</text>
+<text x="533.5" y="279.2" text-anchor="middle" font-size="9.6" fill="#1f2a44">only; tier 2/3 also RCs. Older</text>
+<text x="533.5" y="291.4" text-anchor="middle" font-size="9.6" fill="#1f2a44">than 30 days → archive</text>
+<rect x="305" y="350.6" width="139" height="62.8" rx="7" fill="#fff0cc" stroke="#e0a21a" stroke-width="1.5"/>
+<text x="374.5" y="366.8" text-anchor="middle" font-size="9.6" fill="#1f2a44">Three entry points:</text>
+<text x="374.5" y="379.0" text-anchor="middle" font-size="9.6" fill="#1f2a44">HMAC-signed webhook,</text>
+<text x="374.5" y="391.2" text-anchor="middle" font-size="9.6" fill="#1f2a44">Monday cron (Bearer token),</text>
+<text x="374.5" y="403.4" text-anchor="middle" font-size="9.6" fill="#1f2a44">Sync / Backfill buttons</text>
+<rect x="623" y="344.5" width="139" height="75" rx="7" fill="#fff0cc" stroke="#e0a21a" stroke-width="1.5"/>
+<text x="692.5" y="360.7" text-anchor="middle" font-size="9.6" fill="#1f2a44">One shared pipeline:</text>
+<text x="692.5" y="372.9" text-anchor="middle" font-size="9.6" fill="#1f2a44">de-dupes by repo + tag,</text>
+<text x="692.5" y="385.1" text-anchor="middle" font-size="9.6" fill="#1f2a44">caches the raw notes in</text>
+<text x="692.5" y="397.3" text-anchor="middle" font-size="9.6" fill="#1f2a44">Neon, asks Gemini, stores</text>
+<text x="692.5" y="409.5" text-anchor="middle" font-size="9.6" fill="#1f2a44">the card</text>
+<rect x="782" y="456.5" width="139" height="75" rx="7" fill="#fde4f0" stroke="#d6459b" stroke-width="1.5"/>
+<text x="851.5" y="472.7" text-anchor="middle" font-size="9.6" fill="#1f2a44">Filters noise; one-line impact</text>
+<text x="851.5" y="484.9" text-anchor="middle" font-size="9.6" fill="#1f2a44">summary; effort</text>
+<text x="851.5" y="497.1" text-anchor="middle" font-size="9.6" fill="#1f2a44">Low/Med/High; security</text>
+<text x="851.5" y="509.3" text-anchor="middle" font-size="9.6" fill="#1f2a44">severity + impact; breaking</text>
+<text x="851.5" y="521.5" text-anchor="middle" font-size="9.6" fill="#1f2a44">flag; CVE ids</text>
+<rect x="464" y="580.7" width="139" height="50.599999999999994" rx="7" fill="#e1f4e5" stroke="#3aa356" stroke-width="1.5"/>
+<text x="533.5" y="596.9" text-anchor="middle" font-size="9.6" fill="#1f2a44">Rules: repo tier 1–3, release</text>
+<text x="533.5" y="609.1" text-anchor="middle" font-size="9.6" fill="#1f2a44">notes are untrusted data,</text>
+<text x="533.5" y="621.3" text-anchor="middle" font-size="9.6" fill="#1f2a44">72h alert window</text>
+<rect x="623" y="568.5" width="139" height="75" rx="7" fill="#e1f4e5" stroke="#3aa356" stroke-width="1.5"/>
+<text x="692.5" y="584.7" text-anchor="middle" font-size="9.6" fill="#1f2a44">Validates the JSON (keyword</text>
+<text x="692.5" y="596.9" text-anchor="middle" font-size="9.6" fill="#1f2a44">fallback if blocked). Critical +</text>
+<text x="692.5" y="609.1" text-anchor="middle" font-size="9.6" fill="#1f2a44">High impact within 72h</text>
+<text x="692.5" y="621.3" text-anchor="middle" font-size="9.6" fill="#1f2a44">triggers the emergency rule.</text>
+<text x="692.5" y="633.5" text-anchor="middle" font-size="9.6" font-weight="700" fill="#b3261e">History never alerts</text>
+<rect x="623" y="686.6" width="139" height="62.8" rx="7" fill="#ebe5fb" stroke="#7c5cd6" stroke-width="1.5"/>
+<text x="692.5" y="702.8" text-anchor="middle" font-size="9.6" fill="#1f2a44">Files the card: security /</text>
+<text x="692.5" y="715.0" text-anchor="middle" font-size="9.6" fill="#1f2a44">breaking → Immediate ·</text>
+<text x="692.5" y="727.2" text-anchor="middle" font-size="9.6" fill="#1f2a44">routine → Watchlist · noise +</text>
+<text x="692.5" y="739.4" text-anchor="middle" font-size="9.6" fill="#1f2a44">history → Archived</text>
+<rect x="623" y="798.6" width="139" height="62.8" rx="7" fill="#fde6d0" stroke="#e58a2d" stroke-width="1.5"/>
+<text x="692.5" y="814.8" text-anchor="middle" font-size="9.6" fill="#1f2a44">Banner always on; email via</text>
+<text x="692.5" y="827.0" text-anchor="middle" font-size="9.6" fill="#1f2a44">Resend to saved recipients;</text>
+<text x="692.5" y="839.2" text-anchor="middle" font-size="9.6" fill="#1f2a44">optional ntfy / Slack. One</text>
+<text x="692.5" y="851.4" text-anchor="middle" font-size="9.6" fill="#1f2a44">alert per release</text>
+<rect x="941" y="804.7" width="139" height="50.599999999999994" rx="7" fill="#fde3e0" stroke="#d9534f" stroke-width="1.5"/>
+<text x="1010.5" y="820.9" text-anchor="middle" font-size="9.6" fill="#1f2a44">Emergency email + red</text>
+<text x="1010.5" y="833.1" text-anchor="middle" font-size="9.6" fill="#1f2a44">banner + alert count in the</text>
+<text x="1010.5" y="845.3" text-anchor="middle" font-size="9.6" fill="#1f2a44">browser tab title</text>
+<rect x="146" y="916.7" width="139" height="50.599999999999994" rx="7" fill="#ebe5fb" stroke="#7c5cd6" stroke-width="1.5"/>
+<text x="215.5" y="932.9" text-anchor="middle" font-size="9.6" fill="#1f2a44">Keerthi clicks “Wrong</text>
+<text x="215.5" y="945.1" text-anchor="middle" font-size="9.6" fill="#1f2a44">severity?” and corrects</text>
+<text x="215.5" y="957.3" text-anchor="middle" font-size="9.6" fill="#1f2a44">severity, effort or flags</text>
+<rect x="464" y="916.7" width="139" height="50.599999999999994" rx="7" fill="#e1f4e5" stroke="#3aa356" stroke-width="1.5"/>
+<text x="533.5" y="932.9" text-anchor="middle" font-size="9.6" fill="#1f2a44">Corrections log in Neon:</text>
+<text x="533.5" y="945.1" text-anchor="middle" font-size="9.6" fill="#1f2a44">before / after + reason</text>
+<text x="533.5" y="957.3" text-anchor="middle" font-size="9.6" fill="#1f2a44">(survives repo removal)</text>
+<rect x="623" y="910.6" width="139" height="62.8" rx="7" fill="#e1eefc" stroke="#3b82d6" stroke-width="1.5"/>
+<text x="692.5" y="926.8" text-anchor="middle" font-size="9.6" fill="#1f2a44">Updates and re-homes the</text>
+<text x="692.5" y="939.0" text-anchor="middle" font-size="9.6" fill="#1f2a44">card; newest corrections are</text>
+<text x="692.5" y="951.2" text-anchor="middle" font-size="9.6" fill="#1f2a44">replayed to Gemini as</text>
+<text x="692.5" y="963.4" text-anchor="middle" font-size="9.6" fill="#1f2a44">calibration examples</text>
+<rect x="941" y="1022.6" width="139" height="62.8" rx="7" fill="#fde3e0" stroke="#d9534f" stroke-width="1.5"/>
+<text x="1010.5" y="1038.8" text-anchor="middle" font-size="9.6" fill="#1f2a44">Digest on screen: Immediate</text>
+<text x="1010.5" y="1051.0" text-anchor="middle" font-size="9.6" fill="#1f2a44">/ Watchlist / Archived tabs,</text>
+<text x="1010.5" y="1063.2" text-anchor="middle" font-size="9.6" fill="#1f2a44">search, Undo, copy ticket,</text>
+<text x="1010.5" y="1075.4" text-anchor="middle" font-size="9.6" fill="#1f2a44">Alerts + repo panels</text>
+<rect x="10" y="1124" width="1080" height="50" rx="9" fill="#e6f5ea" stroke="#4aa564" stroke-width="1.4"/>
+<text x="28" y="1153" font-size="10.5" font-weight="700" fill="#1f7a3d">Built with Claude Code</text>
+<text x="180" y="1153" font-size="9.8" fill="#1f2a44">Next.js 16 frontend + API · Neon (Postgres) · Gemini Flash · Resend (email) · GitHub REST API + webhooks · Vercel cron · Tailwind 4 dark UI</text>
+</svg>
