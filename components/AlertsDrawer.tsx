@@ -89,7 +89,7 @@ export default function AlertsDrawer({ onClose, view, loadError, onViewChange, o
       <aside role="dialog" aria-modal="true" aria-labelledby="alerts-title" className={drawerPanel}>
         <header className={drawerHeader}>
           <div className="flex items-center gap-3">
-            <span className="flex size-8 items-center justify-center rounded-lg bg-indigo-500/15 text-indigo-300 ring-1 ring-indigo-400/25 ring-inset">
+            <span className="flex size-8 items-center justify-center rounded-lg bg-violet-500/15 text-violet-300 ring-1 ring-violet-400/25 ring-inset">
               <Bell className="size-4" aria-hidden />
             </span>
             <div>
@@ -125,7 +125,7 @@ export default function AlertsDrawer({ onClose, view, loadError, onViewChange, o
           {/* Email */}
           <section aria-labelledby="email-title" className={`${surface} space-y-4 p-4`}>
             <div className="flex items-start gap-3">
-              <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-indigo-500/15 text-indigo-300 ring-1 ring-indigo-400/25 ring-inset">
+              <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-violet-500/15 text-violet-300 ring-1 ring-violet-400/25 ring-inset">
                 <Mail className="size-4" aria-hidden />
               </span>
               <div className="min-w-0 flex-1">
@@ -335,7 +335,7 @@ function Switch({
       disabled={disabled}
       onClick={() => onChange(!checked)}
       className={`relative h-6 w-11 shrink-0 rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${focusRing} ${
-        checked ? "bg-indigo-500" : "bg-zinc-700"
+        checked ? "bg-violet-500" : "bg-zinc-700"
       }`}
     >
       <span

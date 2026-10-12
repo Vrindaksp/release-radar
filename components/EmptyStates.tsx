@@ -61,7 +61,7 @@ export function FirstRunPanel({
 }) {
   return (
     <div className="mx-auto my-10 w-full max-w-xl rounded-2xl border border-white/10 bg-zinc-900/70 p-8 text-center shadow-xl shadow-black/40">
-      <span className="mx-auto flex size-12 items-center justify-center rounded-xl bg-indigo-500/15 text-indigo-300 ring-1 ring-indigo-400/25 ring-inset">
+      <span className="mx-auto flex size-12 items-center justify-center rounded-xl bg-violet-500/15 text-violet-300 ring-1 ring-violet-400/25 ring-inset">
         <FolderGit2 className="size-6" aria-hidden />
       </span>
       <h2 className="mt-4 text-lg font-semibold text-zinc-100">No repositories tracked yet</h2>

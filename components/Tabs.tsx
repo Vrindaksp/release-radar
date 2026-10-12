@@ -10,8 +10,7 @@ interface TabMeta {
   icon: LucideIcon;
   /** Shown below the desktop breakpoint, where the full name would not fit. */
   short: string;
-  /** Colour of the active underline and the count pill. */
-  indicator: string;
+  /** Colour of the count pill while the tab is not selected. */
   count: string;
 }
 
@@ -19,20 +18,17 @@ export const TAB_META: Record<TriageColumn, TabMeta> = {
   "Immediate Triage": {
     icon: Siren,
     short: "Immediate",
-    indicator: "bg-red-400",
-    count: "bg-red-500/20 text-red-200 ring-red-400/30",
+    count: "bg-hot/20 text-pink-200 ring-hot/40",
   },
   "Watchlist Radar": {
     icon: Radar,
     short: "Watchlist",
-    indicator: "bg-sky-400",
-    count: "bg-sky-500/20 text-sky-200 ring-sky-400/30",
+    count: "bg-ice/15 text-cyan-200 ring-ice/30",
   },
   "Archived / Cleaned": {
     icon: Archive,
     short: "Archive",
-    indicator: "bg-zinc-400",
-    count: "bg-zinc-500/20 text-zinc-200 ring-white/15",
+    count: "bg-zinc-800 text-zinc-300 ring-white/10",
   },
 };
 
@@ -66,7 +62,7 @@ export default function Tabs({ active, counts, onChange }: TabsProps) {
   }
 
   return (
-    <div role="tablist" aria-label="Release lists" className="thin-scroll flex min-w-0 overflow-x-auto">
+    <div role="tablist" aria-label="Release lists" className="thin-scroll flex min-w-0 gap-1.5 overflow-x-auto px-1 py-2">
       {TRIAGE_COLUMNS.map((column, index) => {
         const meta = TAB_META[column];
         const Icon = meta.icon;
@@ -86,24 +82,23 @@ export default function Tabs({ active, counts, onChange }: TabsProps) {
             tabIndex={selected ? 0 : -1}
             onClick={() => onChange(column)}
             onKeyDown={(event) => onKeyDown(event, index)}
-            className={`relative inline-flex shrink-0 items-center gap-2 rounded-t-lg px-3 py-3 text-sm font-medium whitespace-nowrap transition-colors sm:px-4 ${focusRing} ${
-              selected ? "text-zinc-50" : "text-zinc-400 hover:text-zinc-100"
+            className={`relative inline-flex shrink-0 items-center gap-2 rounded-full px-3 py-2 text-sm font-bold whitespace-nowrap sm:px-3.5 transition-all active:scale-[0.97] ${focusRing} ${
+              selected ? "bg-zinc-50 text-zinc-950 shadow-lg shadow-black/40" : "text-zinc-300 hover:bg-white/10 hover:text-zinc-50"
             }`}
           >
-            <Icon className="size-4" aria-hidden />
+            <Icon className="hidden size-4 sm:block" aria-hidden />
             <span className="lg:hidden">{meta.short}</span>
             <span className="hidden lg:inline">{column}</span>
             {counts && (
               <span
                 aria-hidden
                 className={`rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums ring-1 ring-inset ${
-                  selected ? meta.count : "bg-zinc-800 text-zinc-300 ring-white/10"
+                  selected ? "bg-zinc-950 text-zinc-50 ring-zinc-950" : meta.count
                 }`}
               >
                 {counts[column]}
               </span>
             )}
-            {selected && <span aria-hidden className={`absolute inset-x-2 bottom-0 h-0.5 rounded-full ${meta.indicator}`} />}
           </button>
         );
       })}

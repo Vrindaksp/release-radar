@@ -15,6 +15,8 @@ export interface DigestSummary {
   /** Of the urgent list, how many are security fixes / breaking changes (a card can be both). */
   security: number;
   breaking: number;
+  /** Of the urgent list, how many tripped the emergency rule (critical, high-impact security fix). */
+  emergencies: number;
   /** Urgent items published this week vs. earlier. Urgent items never age out of the list. */
   newThisWeek: number;
   carriedOver: number;
@@ -39,6 +41,7 @@ export function summarizeDigest(releases: readonly Release[], now = Date.now()):
     watching: releases.filter((release) => release.triageColumn === "Watchlist Radar").length,
     security: urgent.filter((release) => release.isSecurityFix).length,
     breaking: urgent.filter((release) => release.isBreakingChange).length,
+    emergencies: urgent.filter((release) => release.emergencyAt).length,
     newThisWeek: urgent.filter(inWindow).length,
     carriedOver: urgent.filter((release) => !inWindow(release)).length,
     releasesThisWeek: recent.length,

@@ -4,12 +4,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AboutDrawer from "@/components/AboutDrawer";
 import AlertsDrawer from "@/components/AlertsDrawer";
 import Board from "@/components/Board";
-import DigestSummary from "@/components/DigestSummary";
 import EmergencyBanner from "@/components/EmergencyBanner";
 import { BoardSkeleton, ErrorPanel, FirstRunPanel } from "@/components/EmptyStates";
 import RepoDrawer, { type BackfillState } from "@/components/RepoDrawer";
+import SwipeDeck from "@/components/SwipeDeck";
 import Toasts, { type Toast } from "@/components/Toasts";
 import TopBar from "@/components/TopBar";
+import Tour from "@/components/Tour";
+import VibeCheck from "@/components/VibeCheck";
 import {
   addRepository,
   ApiError,
@@ -25,8 +27,11 @@ import {
   runSync,
   submitFeedback,
 } from "@/lib/client";
+import { deckQueue } from "@/lib/deck";
+import { summarizeDigest } from "@/lib/digest";
 import { filterReleases } from "@/lib/search";
 import { countByColumn, DEFAULT_TAB, hashForTab, tabFromHash } from "@/lib/tabs";
+import { vibeFor } from "@/lib/vibe";
 import { TRIAGE_COLUMNS } from "@/lib/types";
 import type {
   AlertsView,
@@ -41,6 +46,13 @@ import type {
 
 const errorMessage = (error: unknown) => (error instanceof Error ? error.message : "Something went wrong.");
 
+/** What the toast says after a card changes lists. */
+const MOVE_COPY: Record<TriageColumn, string> = {
+  "Immediate Triage": "is back in Immediate Triage 🚨",
+  "Watchlist Radar": "is on the watch pile 👀",
+  "Archived / Cleaned": "was yeeted to the Archive 🗑️",
+};
+
 export default function DashboardPage() {
   const [digest, setDigest] = useState<DigestResponse | null>(null);
   const [repos, setRepos] = useState<Repository[]>([]);
@@ -53,6 +65,11 @@ export default function DashboardPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [alertsOpen, setAlertsOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
+  /** The urgent list, dealt out as swipeable cards; null while swipe triage is closed. */
+  const [deck, setDeck] = useState<Release[] | null>(null);
+  /** The guided tour. It opens on every visit, for everyone, and nothing about it is remembered. */
+  const [tourOpen, setTourOpen] = useState(false);
+  const tourOffered = useRef(false);
   const [alerts, setAlerts] = useState<AlertsView | null>(null);
   const [alertsError, setAlertsError] = useState<string | null>(null);
   const [syncing, setSyncing] = useState(false);
@@ -66,6 +83,11 @@ export default function DashboardPage() {
   const closeDrawer = useCallback(() => setDrawerOpen(false), []);
   const closeAlerts = useCallback(() => setAlertsOpen(false), []);
   const closeAbout = useCallback(() => setAboutOpen(false), []);
+  const closeTour = useCallback(() => setTourOpen(false), []);
+  const replayTour = useCallback(() => {
+    setAboutOpen(false);
+    setTourOpen(true);
+  }, []);
 
   // The Alerts panel's state also drives the little status dot on its top-bar button, so load it
   // up front — separately from the digest, so a problem here never blanks the board.
@@ -112,6 +134,14 @@ export default function DashboardPage() {
     void load();
     void loadAlerts();
   }, [load, loadAlerts]);
+
+  // The tour starts once there is something on the page to point at, every time the app is opened.
+  useEffect(() => {
+    if (digest && !tourOffered.current) {
+      tourOffered.current = true;
+      setTourOpen(true);
+    }
+  }, [digest]);
 
   // Emergencies are visible from the browser tab too.
   const emergencyCount = (digest?.releases ?? []).filter(
@@ -164,7 +194,18 @@ export default function DashboardPage() {
     [changeTab],
   );
 
-  // Keyboard: "/" jumps to the search box (like GitHub); 1 / 2 / 3 switch tabs; "?" opens How it works.
+  /** Deals the urgent list out as swipeable cards. A snapshot, so the deck keeps its order as cards move. */
+  const startDeck = useCallback(() => {
+    const queue = deckQueue(digest?.releases ?? []);
+    if (queue.length === 0) {
+      notify("info", "Nothing urgent to swipe. Immaculate ✨");
+      return;
+    }
+    setDeck(queue);
+  }, [digest, notify]);
+
+  // Keyboard: "/" jumps to the search box (like GitHub); 1 / 2 / 3 switch tabs; "?" opens How it works;
+  // "s" starts swipe triage.
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.metaKey || event.ctrlKey || event.altKey) return;
@@ -181,12 +222,17 @@ export default function DashboardPage() {
         setAboutOpen(true);
         return;
       }
+      if (event.key === "s" || event.key === "S") {
+        event.preventDefault();
+        startDeck();
+        return;
+      }
       const index = ["1", "2", "3"].indexOf(event.key);
       if (index !== -1) changeTab(TRIAGE_COLUMNS[index]);
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [changeTab]);
+  }, [changeTab, startDeck]);
 
   // ---- derived -------------------------------------------------------------
   const releases = digest?.releases;
@@ -206,6 +252,13 @@ export default function DashboardPage() {
   }, [releases]);
 
   const failingRepos = repos.filter((repo) => repo.isActive && repo.lastSyncError).length;
+
+  // How the digest feels, in numbers and words; its colour also tints the glow behind the page.
+  const summary = useMemo(() => summarizeDigest(releases ?? []), [releases]);
+  const vibe = useMemo(() => vibeFor(summary), [summary]);
+  useEffect(() => {
+    document.documentElement.dataset.vibe = digest ? vibe.vibe : "calm";
+  }, [digest, vibe.vibe]);
 
   /** A security / breaking chip in the summary: filter to it and show where those cards are. */
   const showFiltered = useCallback(
@@ -258,7 +311,7 @@ export default function DashboardPage() {
       try {
         await moveRelease(release.id, column);
         if (options.undoable !== false) {
-          notify("info", `${release.repoName} ${release.versionTag} moved to ${column}`, {
+          notify("info", `${release.repoName} ${release.versionTag} ${MOVE_COPY[column]}`, {
             label: "Undo",
             onClick: () => void handleMove({ ...release, triageColumn: column }, previous, { undoable: false }),
           });
@@ -431,8 +484,9 @@ export default function DashboardPage() {
           />
         ) : (
           <>
-            <DigestSummary
-              releases={digest?.releases ?? []}
+            <VibeCheck
+              summary={summary}
+              vibe={vibe}
               reposMonitored={digest?.stats.reposMonitored ?? 0}
               lastSyncedAt={digest?.stats.lastSyncedAt ?? null}
               failingRepos={failingRepos}
@@ -441,6 +495,7 @@ export default function DashboardPage() {
               onOpenTab={changeTab}
               onOpenRepos={() => setDrawerOpen(true)}
               onOpenAbout={() => setAboutOpen(true)}
+              onStartDeck={startDeck}
             />
             <Board
               tab={tab}
@@ -481,7 +536,19 @@ export default function DashboardPage() {
         />
       )}
 
-      {aboutOpen && <AboutDrawer onClose={closeAbout} rule={alerts?.rule ?? null} />}
+      {aboutOpen && <AboutDrawer onClose={closeAbout} rule={alerts?.rule ?? null} onReplayTour={replayTour} />}
+
+      {tourOpen && <Tour onClose={closeTour} />}
+
+      {deck && (
+        <SwipeDeck
+          queue={deck}
+          // The deck has its own undo, so skip the board's "moved" toast for each swipe.
+          onMove={(release, column) => handleMove(release, column, { undoable: false })}
+          onNotify={notify}
+          onClose={() => setDeck(null)}
+        />
+      )}
 
       <Toasts toasts={toasts} onDismiss={dismissToast} />
     </div>

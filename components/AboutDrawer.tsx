@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { CircleHelp, ExternalLink, X } from "lucide-react";
+import { ArrowRight, CircleHelp, ExternalLink, X } from "lucide-react";
 import type { AlertsView } from "@/lib/types";
 import { drawerBackdrop, drawerHeader, drawerPanel, focusRing, iconBtn, surface } from "./ui";
 
@@ -9,6 +9,8 @@ interface AboutDrawerProps {
   onClose: () => void;
   /** The live emergency rule, so the text matches what the server actually does. null until it has loaded. */
   rule: AlertsView["rule"] | null;
+  /** Closes this panel and starts the guided tour again. */
+  onReplayTour: () => void;
 }
 
 const REPO_URL = "https://github.com/Vrindaksp/release-radar";
@@ -63,7 +65,7 @@ const STEPS: { title: string; body: (rule: AboutDrawerProps["rule"]) => React.Re
   },
 ];
 
-const SECTION_TITLE = "text-xs font-semibold tracking-wider text-indigo-300 uppercase";
+const SECTION_TITLE = "text-xs font-semibold tracking-wider text-violet-300 uppercase";
 
 const ROLES: { who: string; does: string }[] = [
   { who: "Gemini", does: "Reads the release text and proposes the summary, the flags and the ratings." },
@@ -83,12 +85,13 @@ const LIMITS = [
 const SHORTCUTS: [string, string][] = [
   ["/", "Search"],
   ["1 2 3", "Switch list"],
+  ["S", "Swipe triage"],
   ["?", "This panel"],
   ["Esc", "Close a panel"],
 ];
 
 /** "How it works": the pipeline, who decides what, and where it falls short. */
-export default function AboutDrawer({ onClose, rule }: AboutDrawerProps) {
+export default function AboutDrawer({ onClose, rule, onReplayTour }: AboutDrawerProps) {
   const panelRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -110,7 +113,7 @@ export default function AboutDrawer({ onClose, rule }: AboutDrawerProps) {
       <aside ref={panelRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="about-title" className={`${drawerPanel} focus:outline-none`}>
         <header className={drawerHeader}>
           <div className="flex items-center gap-3">
-            <span className="flex size-8 items-center justify-center rounded-lg bg-indigo-500/15 text-indigo-300 ring-1 ring-indigo-400/25 ring-inset">
+            <span className="flex size-8 items-center justify-center rounded-lg bg-violet-500/15 text-violet-300 ring-1 ring-violet-400/25 ring-inset">
               <CircleHelp className="size-4" aria-hidden />
             </span>
             <div>
@@ -126,6 +129,15 @@ export default function AboutDrawer({ onClose, rule }: AboutDrawerProps) {
         </header>
 
         <div className="thin-scroll min-h-0 flex-1 space-y-6 overflow-y-auto px-5 py-5">
+          <button
+            type="button"
+            onClick={onReplayTour}
+            className="flex w-full items-center justify-between gap-3 rounded-2xl bg-acid/10 px-4 py-3 text-left text-sm font-bold text-acid ring-1 ring-acid/40 transition-colors ring-inset hover:bg-acid hover:text-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-acid"
+          >
+            Take the guided tour again
+            <ArrowRight className="size-4" aria-hidden />
+          </button>
+
           <section aria-labelledby="about-pipeline">
             <h3 id="about-pipeline" className={SECTION_TITLE}>
               From release to list
@@ -134,7 +146,7 @@ export default function AboutDrawer({ onClose, rule }: AboutDrawerProps) {
               {STEPS.map((step, index) => (
                 <li key={step.title} className="relative flex gap-3 pb-5 last:pb-0">
                   {index < STEPS.length - 1 && <span aria-hidden className="absolute top-7 bottom-0 left-3 w-px bg-white/10" />}
-                  <span className="relative flex size-6 shrink-0 items-center justify-center rounded-full bg-indigo-500/15 font-mono text-xs font-semibold text-indigo-200 ring-1 ring-indigo-400/30 ring-inset">
+                  <span className="relative flex size-6 shrink-0 items-center justify-center rounded-full bg-violet-500/15 font-mono text-xs font-semibold text-violet-200 ring-1 ring-violet-400/30 ring-inset">
                     {index + 1}
                   </span>
                   <p className="text-sm leading-relaxed text-zinc-400">
@@ -188,7 +200,7 @@ export default function AboutDrawer({ onClose, rule }: AboutDrawerProps) {
             href={REPO_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className={`inline-flex items-center gap-1.5 rounded text-sm font-medium text-indigo-300 underline-offset-2 hover:underline ${focusRing}`}
+            className={`inline-flex items-center gap-1.5 rounded text-sm font-medium text-violet-300 underline-offset-2 hover:underline ${focusRing}`}
           >
             Source code and setup guide
             <ExternalLink className="size-3.5" aria-hidden />

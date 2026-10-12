@@ -45,9 +45,16 @@ interface ReleaseCardProps {
 
 function accentFor(release: Release): string {
   if (release.triageColumn === "Archived / Cleaned") return "border-l-zinc-600";
-  if (release.isSecurityFix) return "border-l-red-500";
-  if (release.isBreakingChange) return "border-l-orange-500";
-  return "border-l-sky-500";
+  if (release.isSecurityFix) return "border-l-hot";
+  if (release.isBreakingChange) return "border-l-amber-400";
+  return "border-l-ice";
+}
+
+/** The spotlight under the pointer (see .glow-card in globals.css) follows the cursor across the card. */
+function trackPointer(event: React.PointerEvent<HTMLElement>) {
+  const box = event.currentTarget.getBoundingClientRect();
+  event.currentTarget.style.setProperty("--mx", `${event.clientX - box.left}px`);
+  event.currentTarget.style.setProperty("--my", `${event.clientY - box.top}px`);
 }
 
 type NotesState =
@@ -86,7 +93,7 @@ export default function ReleaseCard({ release, onMove, onFeedback, onNotify }: R
     try {
       await copyToClipboard(buildTicket(release));
       setCopied(true);
-      onNotify("success", `Ticket for ${release.repoName} ${release.versionTag} copied to clipboard`);
+      onNotify("success", `Ticket for ${release.repoName} ${release.versionTag} copied. Go be a hero 🦸`);
       setTimeout(() => setCopied(false), 2000);
     } catch {
       onNotify("error", "Couldn't access the clipboard — check browser permissions.");
@@ -97,7 +104,8 @@ export default function ReleaseCard({ release, onMove, onFeedback, onNotify }: R
     <article
       id={`release-${release.id}`}
       tabIndex={-1}
-      className={`animate-rise-in rounded-xl border border-l-4 border-white/10 bg-zinc-900 shadow-lg shadow-black/30 transition-colors hover:border-white/20 hover:bg-zinc-900 focus:outline-none ${accentFor(release)} ${archived ? "bg-zinc-900/60" : ""}`}
+      onPointerMove={trackPointer}
+      className={`glow-card animate-rise-in rounded-2xl border border-l-4 border-white/10 bg-zinc-900 shadow-lg shadow-black/30 transition-all hover:-translate-y-0.5 hover:border-white/20 hover:shadow-xl hover:shadow-black/50 focus:outline-none ${accentFor(release)} ${archived ? "bg-zinc-900/60" : ""}`}
     >
       <div className="space-y-3 p-4">
         <header className="flex items-start justify-between gap-3">
@@ -106,7 +114,7 @@ export default function ReleaseCard({ release, onMove, onFeedback, onNotify }: R
               href={release.htmlUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className={`block truncate rounded text-sm font-semibold text-zinc-100 transition-colors hover:text-indigo-300 hover:underline ${focusRing}`}
+              className={`block truncate rounded font-display text-lg leading-tight font-extrabold tracking-tight text-zinc-50 transition-colors hover:text-acid ${focusRing}`}
               title={`${release.repoName} — open release on GitHub`}
             >
               {release.repoName}
@@ -144,10 +152,10 @@ export default function ReleaseCard({ release, onMove, onFeedback, onNotify }: R
         </p>
 
         {inlineAction && (
-          <div className="flex gap-2.5 rounded-r-lg border-l-2 border-indigo-400/70 bg-indigo-500/[0.08] py-2 pr-3 pl-3">
-            <ListChecks className="mt-0.5 size-4 shrink-0 text-indigo-300" aria-hidden />
+          <div className="flex gap-2.5 rounded-r-lg border-l-2 border-violet-400/70 bg-violet-500/[0.08] py-2 pr-3 pl-3">
+            <ListChecks className="mt-0.5 size-4 shrink-0 text-violet-300" aria-hidden />
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold tracking-wide text-indigo-300 uppercase">Recommended action</p>
+              <p className="text-[11px] font-semibold tracking-wide text-violet-300 uppercase">Recommended action</p>
               <p className="mt-0.5 text-sm leading-relaxed text-zinc-100">{inlineAction}</p>
             </div>
           </div>
@@ -166,7 +174,7 @@ export default function ReleaseCard({ release, onMove, onFeedback, onNotify }: R
           {release.userCorrected && (
             <span
               title="You corrected Gemini's classification of this release"
-              className="inline-flex items-center gap-1 rounded bg-indigo-500/15 px-1.5 py-0.5 text-[11px] font-medium text-indigo-300 ring-1 ring-indigo-400/30 ring-inset"
+              className="inline-flex items-center gap-1 rounded bg-violet-500/15 px-1.5 py-0.5 text-[11px] font-medium text-violet-300 ring-1 ring-violet-400/30 ring-inset"
             >
               <PencilLine className="size-3" aria-hidden />
               corrected
@@ -204,7 +212,7 @@ export default function ReleaseCard({ release, onMove, onFeedback, onNotify }: R
                   onClick={() => setCorrecting((value) => !value)}
                   aria-expanded={correcting}
                   title="Tell Gemini it got the severity, effort or flags wrong"
-                  className={`inline-flex shrink-0 items-center gap-1 rounded text-xs font-medium text-zinc-400 transition-colors hover:text-indigo-300 ${focusRing}`}
+                  className={`inline-flex shrink-0 items-center gap-1 rounded text-xs font-medium text-zinc-400 transition-colors hover:text-violet-300 ${focusRing}`}
                 >
                   <Flag className="size-3" aria-hidden />
                   Wrong severity?
@@ -243,12 +251,12 @@ export default function ReleaseCard({ release, onMove, onFeedback, onNotify }: R
         )}
       </div>
 
-      <footer className="flex flex-wrap items-center gap-1.5 rounded-b-xl border-t border-white/10 bg-black/20 px-3 py-2.5">
+      <footer className="flex flex-wrap items-center gap-1.5 rounded-b-2xl border-t border-white/10 bg-black/20 px-3 py-2.5">
         <button
           type="button"
           onClick={handleCopy}
-          className={`inline-flex min-w-0 flex-[1_1_15rem] items-center justify-center gap-1.5 rounded-lg px-2.5 py-2 text-xs font-semibold text-white shadow-sm transition-colors ${focusRing} ${
-            copied ? "bg-emerald-600" : "bg-indigo-600 shadow-indigo-950/60 hover:bg-indigo-500"
+          className={`inline-flex min-w-0 flex-[1_1_15rem] items-center justify-center gap-1.5 rounded-xl px-2.5 py-2 text-xs font-bold ring-1 transition-all ring-inset active:scale-[0.97] ${focusRing} ${
+            copied ? "bg-emerald-500 text-zinc-950 ring-emerald-300" : "bg-acid/10 text-acid ring-acid/40 hover:bg-acid hover:text-zinc-950"
           }`}
         >
           {copied ? <Check className="size-3.5 shrink-0" aria-hidden /> : <Copy className="size-3.5 shrink-0" aria-hidden />}

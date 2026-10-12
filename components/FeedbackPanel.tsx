@@ -74,7 +74,7 @@ export default function FeedbackPanel({ release, onSubmit, onCancel }: FeedbackP
     <form
       onSubmit={submit}
       aria-label={`Correct the classification of ${release.repoName} ${release.versionTag}`}
-      className="animate-rise-in space-y-3 rounded-lg border border-indigo-400/25 bg-indigo-500/10 p-3 text-xs text-zinc-300"
+      className="animate-rise-in space-y-3 rounded-lg border border-violet-400/25 bg-violet-500/10 p-3 text-xs text-zinc-300"
     >
       <p className="font-semibold text-zinc-100">What did Gemini get wrong?</p>
 
@@ -107,7 +107,7 @@ export default function FeedbackPanel({ release, onSubmit, onCancel }: FeedbackP
               onClick={() => setEffort(value)}
               className={`h-8 flex-1 rounded-lg border text-xs font-semibold transition-colors ${focusRing} ${
                 effort === value
-                  ? "border-indigo-400/60 bg-indigo-600 text-white"
+                  ? "border-violet-400/60 bg-violet-600 text-white"
                   : "border-white/10 bg-zinc-900 text-zinc-300 hover:bg-zinc-800"
               }`}
             >
@@ -119,7 +119,7 @@ export default function FeedbackPanel({ release, onSubmit, onCancel }: FeedbackP
         <span className="font-medium text-zinc-300">Flags</span>
         <div className="flex flex-wrap gap-x-4 gap-y-1">
           <label className="inline-flex items-center gap-1.5">
-            <input type="checkbox" checked={breaking} onChange={(event) => setBreaking(event.target.checked)} className="size-3.5 accent-indigo-500" />
+            <input type="checkbox" checked={breaking} onChange={(event) => setBreaking(event.target.checked)} className="size-3.5 accent-violet-500" />
             Breaking change
           </label>
           <label className={`inline-flex items-center gap-1.5 ${flagged ? "opacity-50" : ""}`}>
@@ -128,7 +128,7 @@ export default function FeedbackPanel({ release, onSubmit, onCancel }: FeedbackP
               checked={flagged ? false : noise}
               disabled={flagged}
               onChange={(event) => setNoise(event.target.checked)}
-              className="size-3.5 accent-indigo-500"
+              className="size-3.5 accent-violet-500"
             />
             Just routine noise
           </label>

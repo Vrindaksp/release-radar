@@ -16,6 +16,16 @@ export function defaultColumnFor(flags: {
   return "Watchlist Radar";
 }
 
+/** Most urgent first: security, then breaking, then critical-path tier, then newest. */
+export function compareReleases(a: Release, b: Release): number {
+  return (
+    Number(b.isSecurityFix) - Number(a.isSecurityFix) ||
+    Number(b.isBreakingChange) - Number(a.isBreakingChange) ||
+    a.tier - b.tier ||
+    Date.parse(b.publishedAt) - Date.parse(a.publishedAt)
+  );
+}
+
 /** Where "Restore" sends an archived card. */
 export function restoreColumnFor(defaultColumn: TriageColumn): TriageColumn {
   return defaultColumn === "Archived / Cleaned" ? "Watchlist Radar" : defaultColumn;

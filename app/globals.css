@@ -3,32 +3,138 @@
 @theme inline {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-display: var(--font-bricolage), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* The palette: acid lime for "do this", hot pink for danger, ice for calm, grape for everything else. */
+  --color-acid: #c8ff4d;
+  --color-hot: #ff5c97;
+  --color-ice: #4de1ff;
+  --color-grape: #a78bfa;
 }
 
 /*
- * Dark theme, tuned to be easy on the eyes: a near-black page (not pure #000, which glares against
- * light text), softly raised surfaces, off-white text instead of pure white, and muted, translucent
- * accent colours rather than saturated solids. Secondary text stays at zinc-400 or lighter so it
- * keeps WCAG AA contrast on every surface.
+ * Still a dark theme (near-black page, off-white text, nothing glaring), but with a point of view:
+ * loud accents used sparingly, and a soft glow behind the page that shifts colour with the digest's
+ * mood (see lib/vibe.ts, which sets data-vibe on <html>). Secondary text stays at zinc-400 or lighter
+ * so it keeps WCAG AA contrast on every surface.
  */
 :root {
   color-scheme: dark;
 }
 
+/*
+ * The glow's two colours as plain numbers, registered so the browser can animate between moods
+ * instead of snapping.
+ */
+@property --ar {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 200;
+}
+@property --ag {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 255;
+}
+@property --ab {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 77;
+}
+@property --br {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 77;
+}
+@property --bg {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 225;
+}
+@property --bb {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 255;
+}
+
+html {
+  /* calm: lime + ice */
+  --ar: 200;
+  --ag: 255;
+  --ab: 77;
+  --br: 77;
+  --bg: 225;
+  --bb: 255;
+  transition:
+    --ar 1.4s,
+    --ag 1.4s,
+    --ab 1.4s,
+    --br 1.4s,
+    --bg 1.4s,
+    --bb 1.4s;
+}
+html[data-vibe="busy"] {
+  /* amber + violet */
+  --ar: 251;
+  --ag: 191;
+  --ab: 36;
+  --br: 139;
+  --bg: 92;
+  --bb: 246;
+}
+html[data-vibe="sus"] {
+  /* hot pink + violet */
+  --ar: 255;
+  --ag: 92;
+  --ab: 151;
+  --br: 139;
+  --bg: 92;
+  --bb: 246;
+}
+html[data-vibe="fire"] {
+  /* red + hot pink */
+  --ar: 239;
+  --ag: 68;
+  --ab: 68;
+  --br: 255;
+  --bg: 92;
+  --bb: 151;
+}
+
 body {
   background-color: #09090b;
-  /* A faint indigo glow at the top gives the page depth without adding noise. */
-  background-image: radial-gradient(900px 380px at 50% -140px, rgba(99, 102, 241, 0.13), transparent 70%);
-  background-repeat: no-repeat;
-  background-attachment: fixed;
   color: #e4e4e7;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* The mood glow: two big soft blobs that drift slowly behind everything. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: -25vmax;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(38vmax 38vmax at 22% 22%, rgb(var(--ar) var(--ag) var(--ab) / 0.17), transparent 65%),
+    radial-gradient(42vmax 42vmax at 80% 14%, rgb(var(--br) var(--bg) var(--bb) / 0.15), transparent 65%);
+  animation: aura-drift 28s ease-in-out infinite alternate;
+}
+
+/* A whisper of film grain, so the black feels like a surface instead of a screen. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
 ::selection {
-  background: rgba(129, 140, 248, 0.35);
+  background: rgba(200, 255, 77, 0.35);
   color: #fff;
 }
 
@@ -78,6 +184,59 @@ body {
   }
 }
 
+@keyframes aura-drift {
+  from {
+    transform: translate3d(-2vmax, -1vmax, 0) scale(1);
+  }
+  to {
+    transform: translate3d(3vmax, 2vmax, 0) scale(1.08);
+  }
+}
+
+/* The big sticker next to the headline: a little head-tilt every few seconds. */
+@keyframes wiggle {
+  0%,
+  72%,
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+  78% {
+    transform: rotate(-9deg) scale(1.08);
+  }
+  86% {
+    transform: rotate(8deg) scale(1.08);
+  }
+  93% {
+    transform: rotate(-4deg) scale(1.03);
+  }
+}
+
+/* A stamp slamming down on a swiped card. */
+@keyframes stamp {
+  from {
+    transform: scale(1.6) rotate(-14deg);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) rotate(-8deg);
+    opacity: 1;
+  }
+}
+
+@keyframes pop-in {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 .animate-slide-in {
   animation: slide-in 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
@@ -90,10 +249,46 @@ body {
   animation: rise-in 0.22s ease-out;
 }
 
+.animate-wiggle {
+  animation: wiggle 5s ease-in-out infinite;
+}
+
+.animate-pop-in {
+  animation: pop-in 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+
+/* Cards light up under the pointer: a soft spotlight in the current mood colour. */
+.glow-card {
+  position: relative;
+}
+.glow-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s;
+  background: radial-gradient(340px circle at var(--mx, 50%) var(--my, 50%), rgb(var(--ar) var(--ag) var(--ab) / 0.11), transparent 65%);
+}
+@media (hover: hover) {
+  .glow-card:hover::before {
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  html {
+    transition: none;
+  }
+  body::before {
+    animation: none;
+  }
   .animate-slide-in,
   .animate-fade-in,
-  .animate-rise-in {
+  .animate-rise-in,
+  .animate-wiggle,
+  .animate-pop-in {
     animation: none;
   }
 }

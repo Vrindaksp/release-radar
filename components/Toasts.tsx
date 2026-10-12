@@ -14,7 +14,7 @@ export interface Toast {
 const STYLES = {
   success: { box: "border-emerald-400/30 bg-emerald-950/90 text-emerald-50", icon: CircleCheck, tint: "text-emerald-300" },
   error: { box: "border-red-400/30 bg-red-950/90 text-red-50", icon: CircleAlert, tint: "text-red-300" },
-  info: { box: "border-white/15 bg-zinc-900/95 text-zinc-100", icon: Info, tint: "text-indigo-300" },
+  info: { box: "border-white/15 bg-zinc-900/95 text-zinc-100", icon: Info, tint: "text-violet-300" },
 } as const;
 
 export default function Toasts({ toasts, onDismiss }: { toasts: Toast[]; onDismiss: (id: number) => void }) {
@@ -27,7 +27,7 @@ export default function Toasts({ toasts, onDismiss }: { toasts: Toast[]; onDismi
           <div
             key={toast.id}
             role={toast.kind === "error" ? "alert" : "status"}
-            className={`animate-rise-in pointer-events-auto flex items-start gap-2.5 rounded-xl border px-3 py-2.5 text-sm shadow-2xl shadow-black/50 backdrop-blur ${style.box}`}
+            className={`animate-rise-in pointer-events-auto flex items-start gap-2.5 rounded-2xl border px-3.5 py-3 text-sm shadow-2xl shadow-black/50 backdrop-blur ${style.box}`}
           >
             <Icon className={`mt-0.5 size-4 shrink-0 ${style.tint}`} aria-hidden />
             <p className="min-w-0 flex-1 break-words">{toast.message}</p>

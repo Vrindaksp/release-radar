@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { TAB_SLUGS } from "@/lib/tabs";
+import { compareReleases } from "@/lib/triage";
 import { TRIAGE_COLUMNS, type FeedbackInput, type Release, type TriageColumn } from "@/lib/types";
 import ReleaseCard from "./ReleaseCard";
 import { TAB_META } from "./Tabs";
@@ -9,30 +10,26 @@ import { btnSecondary } from "./ui";
 
 const PAGE_SIZE = 30;
 
+const EMPTY_EMOJI: Record<TriageColumn, string> = {
+  "Immediate Triage": "✨",
+  "Watchlist Radar": "🦗",
+  "Archived / Cleaned": "🗑️",
+};
+
 const COPY: Record<TriageColumn, { subtitle: string; empty: string }> = {
   "Immediate Triage": {
     subtitle: "Security patches & breaking updates that need action now",
-    empty: "Nothing urgent — no security fixes or breaking changes waiting.",
+    empty: "Nothing urgent. Immaculate.",
   },
   "Watchlist Radar": {
     subtitle: "Evaluation cadence & routine new releases",
-    empty: "No routine releases on the radar this week.",
+    empty: "Nothing on the radar. Suspiciously quiet…",
   },
   "Archived / Cleaned": {
     subtitle: "Processed, dismissed, or noise filtered by Gemini — plus backfilled history",
-    empty: "Archived and auto-cleaned releases will show up here.",
+    empty: "Nothing archived yet. Swipe some stuff away.",
   },
 };
-
-/** Most urgent first: security, then breaking, then critical-path tier, then newest. */
-function compareReleases(a: Release, b: Release): number {
-  return (
-    Number(b.isSecurityFix) - Number(a.isSecurityFix) ||
-    Number(b.isBreakingChange) - Number(a.isBreakingChange) ||
-    a.tier - b.tier ||
-    Date.parse(b.publishedAt) - Date.parse(a.publishedAt)
-  );
-}
 
 interface BoardProps {
   /** The tab being shown. */
@@ -60,7 +57,7 @@ export default function Board({ tab, releases, counts, filtering, onTabChange, o
       <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-1">
         <div className="flex items-center gap-2.5">
           <Icon className="size-4 text-zinc-400" aria-hidden />
-          <h2 className="text-base font-semibold text-zinc-100">{tab}</h2>
+          <h2 className="font-display text-2xl font-extrabold tracking-tight text-zinc-50">{tab}</h2>
         </div>
         <p className="text-sm text-zinc-400">{COPY[tab].subtitle}</p>
       </div>
@@ -71,7 +68,7 @@ export default function Board({ tab, releases, counts, filtering, onTabChange, o
           {elsewhere.map((column, index) => (
             <span key={column}>
               {index > 0 && ", "}
-              <button type="button" onClick={() => onTabChange(column)} className="font-medium text-indigo-300 underline-offset-2 hover:underline">
+              <button type="button" onClick={() => onTabChange(column)} className="font-medium text-violet-300 underline-offset-2 hover:underline">
                 {column} ({counts[column]})
               </button>
             </span>
@@ -80,8 +77,13 @@ export default function Board({ tab, releases, counts, filtering, onTabChange, o
       )}
 
       {items.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-white/10 px-6 py-14 text-center">
-          <p className="text-sm text-zinc-300">{filtering ? "No releases match the current search / filter here." : COPY[tab].empty}</p>
+        <div className="rounded-3xl border border-dashed border-white/15 px-6 py-14 text-center">
+          <span aria-hidden className="animate-wiggle inline-block text-5xl">
+            {filtering ? "🔍" : EMPTY_EMOJI[tab]}
+          </span>
+          <p className="mt-3 font-display text-xl font-bold text-zinc-100">
+            {filtering ? "Nothing matches that here." : COPY[tab].empty}
+          </p>
           {filtering && elsewhere.length > 0 && (
             <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
               {elsewhere.map((column) => (

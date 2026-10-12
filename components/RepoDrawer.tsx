@@ -99,7 +99,7 @@ export default function RepoDrawer(props: RepoDrawerProps) {
       <aside role="dialog" aria-modal="true" aria-labelledby="repo-drawer-title" className={drawerPanel}>
         <header className={drawerHeader}>
           <div className="flex items-center gap-3">
-            <span className="flex size-8 items-center justify-center rounded-lg bg-indigo-500/15 text-indigo-300 ring-1 ring-indigo-400/25 ring-inset">
+            <span className="flex size-8 items-center justify-center rounded-lg bg-violet-500/15 text-violet-300 ring-1 ring-violet-400/25 ring-inset">
               <FolderGit2 className="size-4" aria-hidden />
             </span>
             <div>
@@ -273,7 +273,7 @@ function RepoRow({
   }
 
   const quietField =
-    "h-8 rounded-md border border-transparent bg-zinc-800/70 px-2 text-xs text-zinc-200 transition-colors hover:border-white/15 focus:border-indigo-400/70 focus:bg-zinc-800 focus:outline-2 focus:outline-indigo-400/25";
+    "h-8 rounded-md border border-transparent bg-zinc-800/70 px-2 text-xs text-zinc-200 transition-colors hover:border-white/15 focus:border-violet-400/70 focus:bg-zinc-800 focus:outline-2 focus:outline-violet-400/25";
 
   return (
     <li className={`${surface} p-3 transition-opacity ${repo.isActive ? "" : "opacity-60"} ${busy ? "pointer-events-none opacity-60" : ""}`}>
@@ -283,7 +283,7 @@ function RepoRow({
             href={repo.htmlUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className={`inline-flex max-w-full items-center gap-1 rounded font-mono text-sm font-semibold text-zinc-100 transition-colors hover:text-indigo-300 hover:underline ${focusRing}`}
+            className={`inline-flex max-w-full items-center gap-1 rounded font-mono text-sm font-semibold text-zinc-100 transition-colors hover:text-violet-300 hover:underline ${focusRing}`}
           >
             <span className="truncate">{repo.repoName}</span>
             <ExternalLink className="size-3 shrink-0 text-zinc-500" aria-hidden />

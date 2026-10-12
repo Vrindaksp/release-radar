@@ -3,9 +3,11 @@ import { effortLabel } from "@/lib/triage";
 import type { EffortScore, SecuritySeverity, Tier } from "@/lib/types";
 
 /*
- * Badges use translucent tints with a thin inset ring: they read clearly on a dark surface
- * without the glare of saturated solid fills.
+ * Informational badges use translucent tints with a thin inset ring. The two that mean "look at
+ * this" (Security, Breaking) are stickers instead: solid, bold, black text, a hair off-level.
  */
+const STICKER =
+  "inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-extrabold tracking-wide text-zinc-950 uppercase shadow-[0_2px_0_0_rgba(0,0,0,0.55)] transition-transform hover:rotate-0";
 
 /** Monospace version chip, e.g. v2.4.1 */
 export function VersionTag({ tag }: { tag: string }) {
@@ -37,12 +39,13 @@ export function EffortPill({ effort }: { effort: EffortScore }) {
   );
 }
 
+/** The worse the rating, the brighter the sticker: critical gets a white outline and a glow. */
 const SEVERITY_STYLES: Record<SecuritySeverity, string> = {
-  none: "bg-red-500/15 text-red-300 ring-red-400/30",
-  low: "bg-red-500/10 text-red-300 ring-red-400/25",
-  moderate: "bg-red-500/15 text-red-300 ring-red-400/30",
-  high: "bg-red-500/20 text-red-200 ring-red-400/40",
-  critical: "bg-red-500/30 text-red-100 ring-red-300/60",
+  none: "bg-hot/80",
+  low: "bg-hot/80",
+  moderate: "bg-hot/90",
+  high: "bg-hot",
+  critical: "bg-hot ring-2 ring-white/80 shadow-[0_0_14px_rgba(255,92,151,0.7)]",
 };
 
 /** Security flag, with Gemini's severity rating alongside (e.g. "Security · critical"). */
@@ -50,11 +53,11 @@ export function SecurityBadge({ severity }: { severity: SecuritySeverity }) {
   return (
     <span
       title={severity === "none" ? "Security fix" : `Security fix — ${severity} severity`}
-      className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-bold tracking-wide uppercase ring-1 ring-inset ${SEVERITY_STYLES[severity]}`}
+      className={`${STICKER} -rotate-1 ${SEVERITY_STYLES[severity]}`}
     >
       <ShieldAlert className="size-3" aria-hidden />
       Security
-      {severity !== "none" && <span className="font-semibold opacity-90">· {severity}</span>}
+      {severity !== "none" && <span className="font-bold">· {severity}</span>}
     </span>
   );
 }
@@ -121,7 +124,7 @@ export function EmergencyBadge({
 
 export function BreakingBadge() {
   return (
-    <span className="inline-flex items-center gap-1 rounded-md bg-orange-500/15 px-1.5 py-0.5 text-[11px] font-bold tracking-wide text-orange-300 uppercase ring-1 ring-orange-400/30 ring-inset">
+    <span className={`${STICKER} rotate-1 bg-amber-400`}>
       <TriangleAlert className="size-3" aria-hidden />
       Breaking
     </span>
@@ -141,7 +144,7 @@ export function SampleBadge() {
 }
 
 const TIER_STYLES: Record<Tier, string> = {
-  1: "bg-indigo-500/20 text-indigo-200 ring-indigo-400/30",
+  1: "bg-violet-500/20 text-violet-200 ring-violet-400/30",
   2: "bg-sky-500/15 text-sky-300 ring-sky-400/25",
   3: "bg-zinc-700/50 text-zinc-300 ring-white/10",
 };

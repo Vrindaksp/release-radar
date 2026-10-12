@@ -32,10 +32,10 @@ interface TopBarProps {
   emailActive: boolean | null;
 }
 
-const FILTERS: { value: DigestFilter; label: string }[] = [
-  { value: "security", label: "Security Only" },
-  { value: "breaking", label: "Breaking Changes" },
-  { value: "all", label: "All Releases" },
+const FILTERS: { value: DigestFilter; label: string; short: string }[] = [
+  { value: "security", label: "Security Only", short: "Security" },
+  { value: "breaking", label: "Breaking Changes", short: "Breaking" },
+  { value: "all", label: "All Releases", short: "All" },
 ];
 
 /** Width shared with the board below so everything lines up. */
@@ -63,7 +63,7 @@ export default function TopBar(props: TopBarProps) {
 
       <div className="max-md:sticky max-md:top-0 max-md:z-30 max-md:border-b max-md:border-white/10 max-md:bg-zinc-950/95 max-md:backdrop-blur">
         <div className={`${CONTAINER} flex flex-wrap items-end justify-between gap-x-4`}>
-          <div className="max-w-full min-w-0">
+          <div data-tour="tabs" className="max-w-full min-w-0">
             <Tabs active={props.tab} counts={props.tabCounts} onChange={props.onTabChange} />
           </div>
           <FilterGroup
@@ -82,11 +82,11 @@ export default function TopBar(props: TopBarProps) {
 function Brand({ reposMonitored, criticalCount }: { reposMonitored: number | null; criticalCount: number | null }) {
   return (
     <div className="flex min-w-0 flex-1 items-center gap-3 sm:flex-none">
-      <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-lg shadow-indigo-950/50">
+      <span className="flex size-9 shrink-0 items-center justify-center rounded-2xl bg-acid text-zinc-950 shadow-[0_6px_20px_-6px_rgba(200,255,77,0.7)] -rotate-3 transition-transform hover:rotate-3">
         <Radar className="size-5" aria-hidden />
       </span>
       <div className="min-w-0 leading-tight">
-        <h1 className="text-sm font-semibold tracking-tight text-zinc-100">Release Radar</h1>
+        <h1 className="font-display text-lg leading-none font-extrabold tracking-tight text-zinc-50">Release Radar</h1>
         <p className="flex flex-wrap items-center gap-x-1.5 text-xs text-zinc-400" role="status">
           <span className="font-mono font-semibold text-zinc-200 tabular-nums">{reposMonitored ?? "–"}</span>
           {reposMonitored === 1 ? "Repo Monitored" : "Repos Monitored"}
@@ -122,8 +122,8 @@ function SearchBox({
   onQueryChange,
 }: Pick<TopBarProps, "searchRef" | "query" | "onQueryChange">) {
   return (
-    <div className="relative order-last w-full min-w-0 lg:order-none lg:w-auto lg:max-w-md lg:flex-1">
-      <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-500" aria-hidden />
+    <div data-tour="search" className="relative order-last w-full min-w-0 lg:order-none lg:w-auto lg:max-w-md lg:flex-1">
+      <Search className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-zinc-500" aria-hidden />
       <input
         ref={searchRef}
         type="search"
@@ -134,7 +134,7 @@ function SearchBox({
         }}
         placeholder="Ask My Digest… e.g. CVE, stripe, pooling"
         aria-label="Ask My Digest — search releases"
-        className="h-10 w-full rounded-xl border border-white/10 bg-zinc-900 pr-16 pl-9 text-sm text-zinc-100 placeholder:text-zinc-500 transition-colors hover:border-white/20 focus:border-indigo-400/70 focus:outline-2 focus:outline-offset-0 focus:outline-indigo-400/25 [&::-webkit-search-cancel-button]:hidden"
+        className="h-10 w-full rounded-full border border-white/10 bg-zinc-900 pr-16 pl-10 text-sm text-zinc-100 placeholder:text-zinc-500 transition-colors hover:border-white/20 focus:border-acid/70 focus:outline-2 focus:outline-offset-0 focus:outline-acid/25 [&::-webkit-search-cancel-button]:hidden"
       />
       <div className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center gap-1">
         {query ? (
@@ -176,6 +176,7 @@ function Actions(props: TopBarProps) {
         type="button"
         onClick={props.onOpenAlerts}
         aria-label="Alerts"
+        data-tour="alerts"
         title={props.emailActive ? "Emergency email alerts are on" : "Set up emergency email alerts"}
         className={`${btnSecondary} relative h-9 px-3 text-xs`}
       >
@@ -188,7 +189,7 @@ function Actions(props: TopBarProps) {
           />
         )}
       </button>
-      <button type="button" onClick={props.onOpenRepos} aria-label="Manage repos" title="Manage repos" className={`${btnSecondary} h-9 px-3 text-xs`}>
+      <button type="button" onClick={props.onOpenRepos} aria-label="Manage repos" data-tour="repos" title="Manage repos" className={`${btnSecondary} h-9 px-3 text-xs`}>
         <FolderGit2 className="size-3.5" aria-hidden />
         <span className="hidden xl:inline">Manage repos</span>
       </button>
@@ -220,13 +221,13 @@ function FilterGroup({
 }) {
   const counts: Record<DigestFilter, number | null> = { security: securityCount, breaking: breakingCount, all: null };
   return (
-    <div className="flex items-center gap-3 py-1.5">
+    <div className="flex max-w-full min-w-0 items-center gap-3 py-1.5">
       <div
         role="group"
         aria-label="Filter releases"
-        className="thin-scroll flex max-w-full overflow-x-auto rounded-xl bg-zinc-900 p-0.5 ring-1 ring-white/10 ring-inset"
+        className="thin-scroll flex max-w-full overflow-x-auto rounded-full bg-zinc-900 p-0.5 ring-1 ring-white/10 ring-inset"
       >
-        {FILTERS.map(({ value, label }) => {
+        {FILTERS.map(({ value, label, short }) => {
           const active = filter === value;
           const count = counts[value];
           return (
@@ -235,11 +236,12 @@ function FilterGroup({
               type="button"
               aria-pressed={active}
               onClick={() => onChange(value)}
-              className={`inline-flex shrink-0 items-center gap-1.5 rounded-[10px] px-2 py-1.5 text-xs font-semibold whitespace-nowrap transition-colors sm:px-2.5 ${focusRing} ${
-                active ? "bg-zinc-700 text-white shadow-sm" : "text-zinc-400 hover:text-zinc-100"
+              className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-bold whitespace-nowrap transition-all active:scale-[0.97] sm:px-3 ${focusRing} ${
+                active ? "bg-white/15 text-white ring-1 ring-white/25 ring-inset" : "text-zinc-400 hover:text-zinc-100"
               }`}
             >
-              {label}
+              <span className="sm:hidden">{short}</span>
+              <span className="hidden sm:inline">{label}</span>
               {count !== null && count > 0 && (
                 <span
                   className={`rounded-full px-1.5 text-[10px] leading-4 font-bold tabular-nums ring-1 ring-inset ${
