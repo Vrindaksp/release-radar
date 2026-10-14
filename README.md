@@ -37,6 +37,29 @@ Trigger → Input → Context → Processing → AI → Output).
 
 ![Release Radar components map](docs/components-map.png)
 
+## The nine checks: does this deserve to be built?
+
+The MESA "Claude Basics" framework, applied honestly. Kill switches (any No: don't build it), sizing (any No: build
+something smaller) and boundary (any No: put a human exactly there). The answers live in
+[`lib/nine-checks.ts`](lib/nine-checks.ts), which also feeds the slide below and the *How it works* panel.
+
+![Release Radar nine checks](docs/nine-checks.png)
+
+| # | Check | Answer | Honest gap |
+|---|---|---|---|
+| 01 | Problem real? | Yes: a senior engineer, many dependencies, security fixes buried in changelog noise. | The persona comes from the brief, not a user survey. |
+| 02 | Workflow repeated? | Yes: weekly cron plus a live webhook, every repo, every release. | Volume varies a lot by repo. |
+| 03 | Input available? | Yes: GitHub's public releases API; the repo list is the user's own. | Release notes only (no issues, PRs, commits or advisory databases). |
+| 04 | Output valuable? | Yes: ranked lists, severity and impact, effort, recommended action, ready-to-paste ticket. | Only as good as Gemini's classification, hence the original notes link. |
+| 05 | Impact measurable? | Yes: timestamps and a correction log are stored. | No before/after baseline measured yet. |
+| 06 | Failure risk OK? | Yes, with a human gate: it only reads and advises, and nothing is deleted. | A missed critical CVE costs more than a bad movie pick; Gemini has no fixed test set yet. |
+| 07 | Judgment protected? | Yes: Gemini proposes, fixed rules place the card, the user decides. | Gemini's noise flag archives a card without asking (the *Noise this week* tile keeps it visible). |
+| 08 | ROI worth it? | Yes: hours to build, free tiers, a Flash-class model, runs unattended. | Free-tier limits cap scale. |
+| 09 | Owner clear? | Yes: the user owns repos, tiers and every final call. | The dashboard has no sign-in by design; `DASHBOARD_PASSWORD` locks it. |
+
+Ideas the checks kill: *"auto-merge the patch the moment a security release lands"* (killed by 06 + 07) and *"hide
+anything Gemini calls noise, for good"* (killed by 07). The algorithm narrows; the human chooses.
+
 ## Setup
 
 ```bash

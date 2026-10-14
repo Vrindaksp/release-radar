@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { ArrowRight, CircleHelp, ExternalLink, X } from "lucide-react";
+import { ArrowRight, ChevronDown, CircleHelp, ExternalLink, X } from "lucide-react";
+import { CHECK_GROUPS, NINE_CHECKS } from "@/lib/nine-checks";
 import type { AlertsView } from "@/lib/types";
 import { drawerBackdrop, drawerHeader, drawerPanel, focusRing, iconBtn, surface } from "./ui";
 
@@ -180,6 +181,43 @@ export default function AboutDrawer({ onClose, rule, onReplayTour }: AboutDrawer
                 <li key={limit}>{limit}</li>
               ))}
             </ul>
+          </section>
+
+          <section aria-labelledby="about-nine">
+            <h3 id="about-nine" className={SECTION_TITLE}>
+              Does it deserve to exist?
+            </h3>
+            <details className={`${surface} group mt-3`}>
+              <summary
+                className={`flex cursor-pointer list-none items-center justify-between gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-zinc-100 ${focusRing}`}
+              >
+                The nine checks, 9 out of 9
+                <ChevronDown className="size-4 text-zinc-400 transition-transform group-open:rotate-180" aria-hidden />
+              </summary>
+              <div className="space-y-4 border-t border-white/10 px-4 py-4">
+                <p className="text-xs leading-relaxed text-zinc-400">
+                  The checklist from the course for deciding whether something should be built at all, applied to this app. Each answer comes
+                  with its weak spot.
+                </p>
+                {(["kill", "sizing", "boundary"] as const).map((group) => (
+                  <div key={group}>
+                    <p className="text-sm font-semibold text-zinc-100">
+                      {CHECK_GROUPS[group].title} <span className="font-normal text-zinc-400">· {CHECK_GROUPS[group].rule}</span>
+                    </p>
+                    <ul className="mt-2 space-y-3">
+                      {NINE_CHECKS.filter((check) => check.group === group).map((check) => (
+                        <li key={check.n} className="text-sm leading-relaxed text-zinc-400">
+                          <span className="font-mono text-xs font-semibold text-zinc-300">{String(check.n).padStart(2, "0")}</span>{" "}
+                          <strong className="font-semibold text-zinc-100">{check.question}</strong> <span className="font-semibold text-acid">Yes</span>:{" "}
+                          {check.answer}
+                          <span className="mt-0.5 block text-xs text-zinc-400">Weak spot: {check.gap}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </details>
           </section>
 
           <section aria-labelledby="about-keys">
